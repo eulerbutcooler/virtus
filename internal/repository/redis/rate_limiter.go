@@ -25,9 +25,6 @@ func (r *RateLimiter) Allow(ctx context.Context, key string, limit int, window t
 		return false, 0, fmt.Errorf("ratelimiter.Allow: %w", err)
 	}
 	count := int(incr.Val())
-	remaining := limit - count
-	if remaining < 0 {
-		remaining = 0
-	}
+	remaining := max(limit-count, 0)
 	return count <= limit, remaining, nil
 }
