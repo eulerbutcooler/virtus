@@ -131,14 +131,14 @@ func (q *Queries) ListQueueEntries(ctx context.Context, arg ListQueueEntriesPara
 }
 
 const maxQueuePosition = `-- name: MaxQueuePosition :one
-SELECT COALESCE(MAX(position), 0) FROM queue_entries
+SELECT COALESCE(MAX(position), 0)::int4 AS max_position FROM queue_entries
 `
 
-func (q *Queries) MaxQueuePosition(ctx context.Context) (interface{}, error) {
+func (q *Queries) MaxQueuePosition(ctx context.Context) (int32, error) {
 	row := q.db.QueryRow(ctx, maxQueuePosition)
-	var coalesce interface{}
-	err := row.Scan(&coalesce)
-	return coalesce, err
+	var max_position int32
+	err := row.Scan(&max_position)
+	return max_position, err
 }
 
 const updateQueueFunding = `-- name: UpdateQueueFunding :exec

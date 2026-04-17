@@ -1,5 +1,5 @@
 -- name: MaxQueuePosition :one
-SELECT COALESCE(MAX(position), 0) FROM queue_entries;
+SELECT COALESCE(MAX(position), 0)::int4 AS max_position FROM queue_entries;
 
 -- name: EnqueueRequest :one
 INSERT INTO queue_entries (request_id, priority_score, position)
