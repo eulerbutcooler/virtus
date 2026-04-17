@@ -1,0 +1,36 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "internal/repository/postgres/queries"
+    schema: "migrations"
+    gen:
+      go:
+        package: "db"
+        out: "internal/repository/postgres/db"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_pointers_for_null_types: true
+        emit_empty_slices: true
+        overrides:
+          - db_type: "uuid"
+            go_type: "github.com/google/uuid.UUID"
+          - db_type: "pg_catalog.numeric"
+            go_type: "float64"
+          - db_type: "pg_catalog.float8"
+            go_type: "float64"
+          - db_type: "jsonb"
+            go_type: "encoding/json.RawMessage"
+          - db_type: "user_role"
+            go_type: "string"
+          - db_type: "contribution_status"
+            go_type: "string"
+          - db_type: "request_status"
+            go_type: "string"
+          - db_type: "urgency_level"
+            go_type: "string"
+          - db_type: "fulfillment_status"
+            go_type: "string"
+          - db_type: "delivery_status"
+            go_type: "string"
+          - db_type: "institution_type"
+            go_type: "string"
