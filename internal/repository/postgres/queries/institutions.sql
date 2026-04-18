@@ -9,6 +9,19 @@ SELECT * FROM institutions WHERE id = $1 LIMIT 1;
 -- name: GetInstitutionByUserID :one
 SELECT * FROM institutions WHERE user_id = $1 LIMIT 1;
 
+-- name: UpdateInstitution :one
+UPDATE institutions
+SET
+    name          = COALESCE(sqlc.narg('name'), name),
+    type          = COALESCE(sqlc.narg('type'), type),
+    contact_email = COALESCE(sqlc.narg('contact_email'), contact_email),
+    website       = COALESCE(sqlc.narg('website'), website),
+    esg_goals     = COALESCE(sqlc.narg('esg_goals'), esg_goals),
+    verified      = COALESCE(sqlc.narg('verified'), verified),
+    updated_at    = NOW()
+WHERE id = sqlc.arg('id')
+RETURNING *;
+
 -- name: CreateInstitutionalContribution :one
 INSERT INTO institutional_contributions
     (institution_id, pool_id, amount, currency, category_tag, region_tag)

@@ -55,11 +55,21 @@ type CreateInstitutionParams struct {
 	ESGGoals     json.RawMessage
 }
 
+// UpdateInstitutionParams uses pointer fields so only non-nil values are applied.
+type UpdateInstitutionParams struct {
+	Name         *string
+	Type         *InstitutionType
+	ContactEmail *string
+	Website      *string
+	ESGGoals     json.RawMessage // nil means no change
+	Verified     *bool
+}
+
 type InstitutionRepository interface {
 	Create(ctx context.Context, p CreateInstitutionParams) (*Institution, error)
 	GetByID(ctx context.Context, id uuid.UUID) (*Institution, error)
 	GetByUserID(ctx context.Context, userID uuid.UUID) (*Institution, error)
-	Update(ctx context.Context, id uuid.UUID, p CreateInstitutionParams) (*Institution, error)
+	Update(ctx context.Context, id uuid.UUID, p UpdateInstitutionParams) (*Institution, error)
 	CreateContribution(ctx context.Context, institutionID uuid.UUID, amount float64, currency string, categoryTag, regionTag *string) (*InstitutionalContribution, error)
 	ListContributions(ctx context.Context, institutionID uuid.UUID, limit, offset int) ([]*InstitutionalContribution, int, error)
 }

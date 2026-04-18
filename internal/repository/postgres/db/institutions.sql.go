@@ -195,3 +195,53 @@ func (q *Queries) ListInstitutionalContributions(ctx context.Context, arg ListIn
 	}
 	return items, nil
 }
+
+const updateInstitution = `-- name: UpdateInstitution :one
+UPDATE institutions
+SET
+    name          = COALESCE($1, name),
+    type          = COALESCE($2, type),
+    contact_email = COALESCE($3, contact_email),
+    website       = COALESCE($4, website),
+    esg_goals     = COALESCE($5, esg_goals),
+    verified      = COALESCE($6, verified),
+    updated_at    = NOW()
+WHERE id = $7
+RETURNING id, user_id, name, type, contact_email, website, esg_goals, verified, joined_at, updated_at
+`
+
+type UpdateInstitutionParams struct {
+	Name         *string             `json:"name"`
+	Type         NullInstitutionType `json:"type"`
+	ContactEmail *string             `json:"contact_email"`
+	Website      *string             `json:"website"`
+	EsgGoals     []byte              `json:"esg_goals"`
+	Verified     *bool               `json:"verified"`
+	ID           uuid.UUID           `json:"id"`
+}
+
+func (q *Queries) UpdateInstitution(ctx context.Context, arg UpdateInstitutionParams) (Institution, error) {
+	row := q.db.QueryRow(ctx, updateInstitution,
+		arg.Name,
+		arg.Type,
+		arg.ContactEmail,
+		arg.Website,
+		arg.EsgGoals,
+		arg.Verified,
+		arg.ID,
+	)
+	var i Institution
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.Name,
+		&i.Type,
+		&i.ContactEmail,
+		&i.Website,
+		&i.EsgGoals,
+		&i.Verified,
+		&i.JoinedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
