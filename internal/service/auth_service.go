@@ -186,6 +186,8 @@ func (s *AuthService) mintToken(user *domain.User, expiry time.Time, tokenType s
 	return token.SignedString([]byte(s.jwtCfg.Secret))
 }
 
+// Returns parsed claims on success.
+// Will add audience enforcing after http handlers.
 func (s *AuthService) parseToken(tokenStr string) (*Claims, error) {
 	var claims Claims
 	token, err := jwt.ParseWithClaims(

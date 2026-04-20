@@ -18,6 +18,12 @@ SET
 WHERE id = sqlc.arg('id')
 RETURNING *;
 
+-- name: UpdatePasswordHash :exec
+UPDATE users
+SET password_hash = $2,
+    updated_at    = NOW()
+WHERE id = $1;
+
 -- name: DeleteUser :execrows
 DELETE FROM users WHERE id = $1;
 

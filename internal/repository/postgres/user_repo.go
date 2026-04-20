@@ -69,6 +69,16 @@ func (r *userRepo) Update(ctx context.Context, id uuid.UUID, p domain.UpdateUser
 	return rowToUser(row), nil
 }
 
+func (r *userRepo) UpdatePasswordHash(ctx context.Context, id uuid.UUID, hash string) error {
+	if err := r.q.UpdatePasswordHash(ctx, dbgen.UpdatePasswordHashParams{
+		ID:           id,
+		PasswordHash: hash,
+	}); err != nil {
+		return fmt.Errorf("userRepo.UpdatePasswordHash: %w", err)
+	}
+	return nil
+}
+
 func (r *userRepo) Delete(ctx context.Context, id uuid.UUID) error {
 	n, err := r.q.DeleteUser(ctx, id)
 	if err != nil {
