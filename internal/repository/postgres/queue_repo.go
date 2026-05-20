@@ -19,15 +19,15 @@ func NewQueueRepository(q *dbgen.Queries) domain.QueueRepository {
 	return &queueRepo{q: q}
 }
 
-func (r *queueRepo) Enqueue(ctx context.Context, requestID uuid.UUID, score float64) (*domain.QueueEntry, error) {
+// Inserts a request into the queue at the next available position
+func (r *queueRepo) Enqueue(ctx context.Context, requestID uuid.UUID) (*domain.QueueEntry, error) {
 	maxPos, err := r.q.MaxQueuePosition(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("queueRepo.Enqueue maxPos: %w", err)
 	}
 	row, err := r.q.EnqueueRequest(ctx, dbgen.EnqueueRequestParams{
-		RequestID:     requestID,
-		PriorityScore: score,
-		Position:      maxPos + 1,
+		RequestID: requestID,
+		Position:  maxPos + 1,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("queueRepo.Enqueue: %w", err)
@@ -57,18 +57,17 @@ func (r *queueRepo) GetPosition(ctx context.Context, requestID uuid.UUID) (int, 
 	return int(pos), nil
 }
 
-func (r *queueRepo) UpdateScore(ctx context.Context, id uuid.UUID, score float64, position int) error {
-	return r.q.UpdateQueueScore(ctx, dbgen.UpdateQueueScoreParams{
-		ID:            id,
-		PriorityScore: score,
-		Position:      int32(position),
-	})
-}
-
 func (r *queueRepo) UpdateFunding(ctx context.Context, id uuid.UUID, progress float64) error {
 	return r.q.UpdateQueueFunding(ctx, dbgen.UpdateQueueFundingParams{
 		ID:              id,
 		FundingProgress: progress,
+	})
+}
+
+func (r *queueRepo) UpdatePosition(ctx context.Context, id uuid.UUID, position int) error {
+	return r.q.UpdateQueuePosition(ctx, dbgen.UpdateQueuePositionParams{
+		ID:       id,
+		Position: int32(position),
 	})
 }
 
@@ -92,12 +91,23 @@ func (r *queueRepo) ListAll(ctx context.Context, limit, offset int) ([]*domain.Q
 	return out, int(total), nil
 }
 
+func (r *queueRepo) ListAllOrdered(ctx context.Context) ([]*domain.QueueEntry, error) {
+	rows, err := r.q.ListAllQueueEntries(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("queueRepo.ListAllOrdered: %w", err)
+	}
+	out := make([]*domain.QueueEntry, len(rows))
+	for i, row := range rows {
+		out[i] = rowToQueueEntry(row)
+	}
+	return out, nil
+}
+
 func rowToQueueEntry(row dbgen.QueueEntry) *domain.QueueEntry {
 	e := &domain.QueueEntry{
 		ID:              row.ID,
 		RequestID:       row.RequestID,
 		Position:        int(row.Position),
-		PriorityScore:   row.PriorityScore,
 		FundingProgress: row.FundingProgress,
 		EnteredAt:       row.EnteredAt.Time,
 		UpdatedAt:       row.UpdatedAt.Time,

@@ -29,20 +29,6 @@ const (
 	UrgencyLow      UrgencyLevel = "low"
 )
 
-// Returns the scoring weight for a given urgency level.
-func (u UrgencyLevel) Factor() float64 {
-	switch u {
-	case UrgencyCritical:
-		return 1.0
-	case UrgencyHigh:
-		return 0.7
-	case UrgencyStandard:
-		return 0.4
-	default:
-		return 0.2
-	}
-}
-
 type Request struct {
 	ID            uuid.UUID     `json:"id"`
 	UserID        uuid.UUID     `json:"user_id"`
@@ -66,6 +52,7 @@ type CreateRequestParams struct {
 	Urgency       UrgencyLevel
 	EstimatedCost float64
 	Justification string
+	Status        RequestStatus // set explicitly so service controls initial state
 }
 
 type UpdateRequestParams struct {

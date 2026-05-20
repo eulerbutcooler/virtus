@@ -46,8 +46,8 @@ func (q *Queries) CountRequestsByUser(ctx context.Context, userID uuid.UUID) (in
 }
 
 const createRequest = `-- name: CreateRequest :one
-INSERT INTO requests (user_id, item_category, item_name, description, urgency, estimated_cost, justification)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO requests (user_id, item_category, item_name, description, urgency, estimated_cost, justification, status)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING id, user_id, item_category, item_name, description, urgency, estimated_cost, justification, status, rejection_note, created_at, updated_at
 `
 
@@ -59,6 +59,7 @@ type CreateRequestParams struct {
 	Urgency       string    `json:"urgency"`
 	EstimatedCost float64   `json:"estimated_cost"`
 	Justification string    `json:"justification"`
+	Status        string    `json:"status"`
 }
 
 func (q *Queries) CreateRequest(ctx context.Context, arg CreateRequestParams) (Request, error) {
@@ -70,6 +71,7 @@ func (q *Queries) CreateRequest(ctx context.Context, arg CreateRequestParams) (R
 		arg.Urgency,
 		arg.EstimatedCost,
 		arg.Justification,
+		arg.Status,
 	)
 	var i Request
 	err := row.Scan(

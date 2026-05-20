@@ -1,6 +1,6 @@
 -- name: CreateRequest :one
-INSERT INTO requests (user_id, item_category, item_name, description, urgency, estimated_cost, justification)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO requests (user_id, item_category, item_name, description, urgency, estimated_cost, justification, status)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 RETURNING *;
 
 -- name: GetRequestByID :one

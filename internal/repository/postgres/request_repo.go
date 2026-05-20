@@ -29,6 +29,7 @@ func (r *requestRepo) Create(ctx context.Context, p domain.CreateRequestParams) 
 		Urgency:       string(p.Urgency),
 		EstimatedCost: p.EstimatedCost,
 		Justification: p.Justification,
+		Status:        string(p.Status),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("requestRepo.Create: %w", err)

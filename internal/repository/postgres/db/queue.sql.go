@@ -32,25 +32,23 @@ func (q *Queries) DequeueRequest(ctx context.Context, requestID uuid.UUID) error
 }
 
 const enqueueRequest = `-- name: EnqueueRequest :one
-INSERT INTO queue_entries (request_id, priority_score, position)
-VALUES ($1, $2, $3)
-RETURNING id, request_id, position, priority_score, funding_progress, estimated_fulfillment, entered_at, updated_at
+INSERT INTO queue_entries (request_id, position)
+VALUES ($1, $2)
+RETURNING id, request_id, position, funding_progress, estimated_fulfillment, entered_at, updated_at
 `
 
 type EnqueueRequestParams struct {
-	RequestID     uuid.UUID `json:"request_id"`
-	PriorityScore float64   `json:"priority_score"`
-	Position      int32     `json:"position"`
+	RequestID uuid.UUID `json:"request_id"`
+	Position  int32     `json:"position"`
 }
 
 func (q *Queries) EnqueueRequest(ctx context.Context, arg EnqueueRequestParams) (QueueEntry, error) {
-	row := q.db.QueryRow(ctx, enqueueRequest, arg.RequestID, arg.PriorityScore, arg.Position)
+	row := q.db.QueryRow(ctx, enqueueRequest, arg.RequestID, arg.Position)
 	var i QueueEntry
 	err := row.Scan(
 		&i.ID,
 		&i.RequestID,
 		&i.Position,
-		&i.PriorityScore,
 		&i.FundingProgress,
 		&i.EstimatedFulfillment,
 		&i.EnteredAt,
@@ -60,7 +58,7 @@ func (q *Queries) EnqueueRequest(ctx context.Context, arg EnqueueRequestParams) 
 }
 
 const getQueueEntryByRequestID = `-- name: GetQueueEntryByRequestID :one
-SELECT id, request_id, position, priority_score, funding_progress, estimated_fulfillment, entered_at, updated_at FROM queue_entries WHERE request_id = $1 LIMIT 1
+SELECT id, request_id, position, funding_progress, estimated_fulfillment, entered_at, updated_at FROM queue_entries WHERE request_id = $1 LIMIT 1
 `
 
 func (q *Queries) GetQueueEntryByRequestID(ctx context.Context, requestID uuid.UUID) (QueueEntry, error) {
@@ -70,7 +68,6 @@ func (q *Queries) GetQueueEntryByRequestID(ctx context.Context, requestID uuid.U
 		&i.ID,
 		&i.RequestID,
 		&i.Position,
-		&i.PriorityScore,
 		&i.FundingProgress,
 		&i.EstimatedFulfillment,
 		&i.EnteredAt,
@@ -90,9 +87,42 @@ func (q *Queries) GetQueuePosition(ctx context.Context, requestID uuid.UUID) (in
 	return position, err
 }
 
+const listAllQueueEntries = `-- name: ListAllQueueEntries :many
+SELECT id, request_id, position, funding_progress, estimated_fulfillment, entered_at, updated_at FROM queue_entries
+ORDER BY entered_at ASC
+`
+
+func (q *Queries) ListAllQueueEntries(ctx context.Context) ([]QueueEntry, error) {
+	rows, err := q.db.Query(ctx, listAllQueueEntries)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []QueueEntry{}
+	for rows.Next() {
+		var i QueueEntry
+		if err := rows.Scan(
+			&i.ID,
+			&i.RequestID,
+			&i.Position,
+			&i.FundingProgress,
+			&i.EstimatedFulfillment,
+			&i.EnteredAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listQueueEntries = `-- name: ListQueueEntries :many
-SELECT id, request_id, position, priority_score, funding_progress, estimated_fulfillment, entered_at, updated_at FROM queue_entries
-ORDER BY priority_score DESC, entered_at ASC
+SELECT id, request_id, position, funding_progress, estimated_fulfillment, entered_at, updated_at FROM queue_entries
+ORDER BY entered_at ASC
 LIMIT $1 OFFSET $2
 `
 
@@ -114,7 +144,6 @@ func (q *Queries) ListQueueEntries(ctx context.Context, arg ListQueueEntriesPara
 			&i.ID,
 			&i.RequestID,
 			&i.Position,
-			&i.PriorityScore,
 			&i.FundingProgress,
 			&i.EstimatedFulfillment,
 			&i.EnteredAt,
@@ -157,19 +186,18 @@ func (q *Queries) UpdateQueueFunding(ctx context.Context, arg UpdateQueueFunding
 	return err
 }
 
-const updateQueueScore = `-- name: UpdateQueueScore :exec
+const updateQueuePosition = `-- name: UpdateQueuePosition :exec
 UPDATE queue_entries
-SET priority_score = $2, position = $3, updated_at = NOW()
+SET position = $2, updated_at = NOW()
 WHERE id = $1
 `
 
-type UpdateQueueScoreParams struct {
-	ID            uuid.UUID `json:"id"`
-	PriorityScore float64   `json:"priority_score"`
-	Position      int32     `json:"position"`
+type UpdateQueuePositionParams struct {
+	ID       uuid.UUID `json:"id"`
+	Position int32     `json:"position"`
 }
 
-func (q *Queries) UpdateQueueScore(ctx context.Context, arg UpdateQueueScoreParams) error {
-	_, err := q.db.Exec(ctx, updateQueueScore, arg.ID, arg.PriorityScore, arg.Position)
+func (q *Queries) UpdateQueuePosition(ctx context.Context, arg UpdateQueuePositionParams) error {
+	_, err := q.db.Exec(ctx, updateQueuePosition, arg.ID, arg.Position)
 	return err
 }

@@ -420,7 +420,6 @@ type QueueEntry struct {
 	ID                   uuid.UUID          `json:"id"`
 	RequestID            uuid.UUID          `json:"request_id"`
 	Position             int32              `json:"position"`
-	PriorityScore        float64            `json:"priority_score"`
 	FundingProgress      float64            `json:"funding_progress"`
 	EstimatedFulfillment pgtype.Date        `json:"estimated_fulfillment"`
 	EnteredAt            pgtype.Timestamptz `json:"entered_at"`
