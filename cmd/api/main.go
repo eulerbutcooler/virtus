@@ -41,6 +41,7 @@ func run() error {
 
 	ctx := context.Background()
 
+	// Postgres
 	pool, err := postgres.New(ctx, postgres.Config{
 		Host:     cfg.DB.Host,
 		Port:     cfg.DB.Port,
@@ -54,6 +55,7 @@ func run() error {
 	}
 	defer pool.Close()
 
+	// Redis
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     cfg.Redis.Addr,
 		Password: cfg.Redis.Password,
@@ -64,19 +66,36 @@ func run() error {
 	}
 	defer rdb.Close()
 
+	// Repositories
 	queries := dbgen.New(pool)
-	userRepo := postgres.NewUserRepository(queries)
 	cache := redisrepo.NewCache(rdb)
-	authSvc := service.NewAuthService(userRepo, cache, cfg.JWT)
 
+	userRepo := postgres.NewUserRepository(queries)
+	poolRepo := postgres.NewPoolRepository(queries)
+	requestRepo := postgres.NewRequestRepository(queries)
+	queueRepo := postgres.NewQueueRepository(queries)
+
+	// Services
+	authSvc := service.NewAuthService(userRepo, cache, cfg.JWT)
+	poolSvc := service.NewPoolService(poolRepo)
+	queueSvc := service.NewQueueService(queueRepo)
+	requestSvc := service.NewRequestService(requestRepo, queueSvc)
+
+	// HTTP server
 	srv := &http.Server{
-		Addr:         fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port),
-		Handler:      handler.NewRouter(authSvc),
+		Addr: fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port),
+		Handler: handler.NewRouter(handler.Services{
+			Auth:    authSvc,
+			Pool:    poolSvc,
+			Request: requestSvc,
+			Queue:   queueSvc,
+		}),
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
 		IdleTimeout:  cfg.Server.IdleTimeout,
 	}
 
+	// Run server in a goroutine so we can listen for shutdown signals.
 	serverErr := make(chan error, 1)
 	go func() {
 		slog.Info("server starting", "addr", srv.Addr, "env", cfg.Env)
@@ -85,6 +104,7 @@ func run() error {
 		}
 	}()
 
+	// Block until interrupt or a fatal server error.
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
@@ -95,6 +115,7 @@ func run() error {
 		slog.Info("shutdown signal received", "signal", sig.String())
 	}
 
+	// Graceful shutdown with a 15s deadline.
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
