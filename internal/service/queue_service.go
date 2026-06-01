@@ -88,7 +88,7 @@ func (s *QueueService) RecalculateAll(ctx context.Context) error {
 			continue
 		}
 		if err := s.queue.UpdatePosition(ctx, e.ID, newPos); err != nil {
-			_ = err
+			return fmt.Errorf("queueService.RecalculateAll: update position %d: %w", newPos, err)
 		}
 	}
 	return nil

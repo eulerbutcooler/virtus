@@ -51,7 +51,7 @@ func (s *DeliveryService) Ship(ctx context.Context, in ShipInput) (*domain.Deliv
 	}
 
 	existing, err := s.deliveries.GetByFulfillmentID(ctx, in.FulfillmentID)
-	if err != nil && errors.Is(err, domain.ErrNotFound) {
+	if err != nil && !errors.Is(err, domain.ErrNotFound) {
 		return nil, fmt.Errorf("deliveryService.Ship: check existing: %w", err)
 	}
 	if existing != nil {

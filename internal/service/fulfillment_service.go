@@ -110,7 +110,7 @@ func (s *FulfillmentService) UpdateDetails(ctx context.Context, id uuid.UUID, in
 
 	if in.ActualCost != nil && f.ActualCost == nil {
 		if err := s.pool.Debit(ctx, domain.GlobalPoolID, *in.ActualCost); err != nil {
-			_ = err
+			return nil, fmt.Errorf("fulfillmentService.UpdateDetails: debit pool: %w", err)
 		}
 	}
 	return updated, nil
@@ -164,7 +164,7 @@ func (s *FulfillmentService) Cancel(ctx context.Context, id uuid.UUID) (*domain.
 	}
 	if f.ActualCost != nil {
 		if err := s.pool.Credit(ctx, domain.GlobalPoolID, *f.ActualCost); err != nil {
-			_ = err
+			return nil, fmt.Errorf("fulfillmentService.Cancel: credit pool: %w", err)
 		}
 	}
 	if err := s.requests.UpdateStatus(ctx, f.RequestID, domain.RequestFunded, nil); err != nil {

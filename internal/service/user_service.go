@@ -57,7 +57,7 @@ func (s *UserService) ChangePassword(ctx context.Context, id uuid.UUID, in Chang
 		return domain.ErrUnauthorized
 	}
 	if in.CurrentPassword == in.NewPassword {
-		return fmt.Errorf("%w: new password must differe from current password", domain.ErrInvalidInput)
+		return fmt.Errorf("%w: new password must differ from current password", domain.ErrInvalidInput)
 	}
 	hash, err := crypto.HashPassword(in.NewPassword)
 	if err != nil {

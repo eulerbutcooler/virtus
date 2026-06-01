@@ -1,7 +1,7 @@
 CREATE TYPE institution_type AS ENUM ('corporation', 'ngo', 'government', 'foundation', 'other');
 
 CREATE TABLE institutions (
-    id             UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id        UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE RESTRICT,
     name           VARCHAR(255) NOT NULL,
     type           institution_type NOT NULL DEFAULT 'other',

@@ -157,14 +157,16 @@ func (s *RequestService) Reject(ctx context.Context, id uuid.UUID, note string) 
 		return nil, fmt.Errorf("%w: cannot reject a request in %s status", domain.ErrInvalidState, req.Status)
 	}
 
+	wasQueued := req.Status == domain.RequestVerified || req.Status == domain.RequestQueued
+
 	if err := s.requests.UpdateStatus(ctx, id, domain.RequestRejected, &note); err != nil {
 		return nil, fmt.Errorf("requestService.Reject: %w", err)
 	}
 	req.Status = domain.RequestRejected
 	req.RejectionNote = &note
 
-	// If it was already in the queue (verified), remove it.
-	if req.Status == domain.RequestVerified || req.Status == domain.RequestQueued {
+	// If it was already in the queue (verified/queued), remove it.
+	if wasQueued {
 		_ = s.queue.Dequeue(ctx, id) // best-effort; no queue entry if not yet enqueued
 	}
 

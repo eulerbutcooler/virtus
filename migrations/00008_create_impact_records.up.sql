@@ -4,7 +4,7 @@ CREATE TABLE impact_records (
     user_id              UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     interval_label       VARCHAR(50) NOT NULL, -- 7_days, 90_days, etc
     outcome_description  TEXT,
-    satisfaction_score   SMALLINT CHECK (satisfaction_score BETWEEN 1 AND 10),
+    satisfaction_score   SMALLINT CHECK (satisfaction_score BETWEEN 1 AND 5),
     metrics              JSONB NOT NULL DEFAULT '{}',
     recorded_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
