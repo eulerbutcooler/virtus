@@ -18,6 +18,7 @@ import (
 	redisrepo "github.com/eulerbutcooler/virtus/internal/repository/redis"
 	"github.com/eulerbutcooler/virtus/internal/service"
 	"github.com/eulerbutcooler/virtus/pkg/logger"
+	stripepkg "github.com/eulerbutcooler/virtus/pkg/stripe"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -74,28 +75,46 @@ func run() error {
 	poolRepo := postgres.NewPoolRepository(queries)
 	requestRepo := postgres.NewRequestRepository(queries)
 	queueRepo := postgres.NewQueueRepository(queries)
+	contributionRepo := postgres.NewContributionRepository(queries)
+	fulfillmentRepo := postgres.NewFulfillmentRepository(queries)
+	deliveryRepo := postgres.NewDeliveryRepository(queries)
+	impactRepo := postgres.NewImpactRepository(queries)
+	institutionRepo := postgres.NewInstitutionRepository(queries)
+
+	// Stripe
+	stripeProvider := stripepkg.New(cfg.Stripe.SecretKey, cfg.Stripe.WebhookSecret)
 
 	// Services
 	authSvc := service.NewAuthService(userRepo, cache, cfg.JWT)
 	poolSvc := service.NewPoolService(poolRepo)
 	queueSvc := service.NewQueueService(queueRepo)
 	requestSvc := service.NewRequestService(requestRepo, queueSvc)
+	contributionSvc := service.NewContributionService(contributionRepo, poolSvc, pool, queries, stripeProvider)
+	fulfillmentSvc := service.NewFulfillmentService(fulfillmentRepo, requestRepo, poolSvc)
+	deliverySvc := service.NewDeliveryService(deliveryRepo, fulfillmentSvc)
+	impactSvc := service.NewImpactService(impactRepo, deliveryRepo)
+	institutionSvc := service.NewInstitutionService(institutionRepo, poolSvc)
 
 	// HTTP server
 	srv := &http.Server{
 		Addr: fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port),
 		Handler: handler.NewRouter(handler.Services{
-			Auth:    authSvc,
-			Pool:    poolSvc,
-			Request: requestSvc,
-			Queue:   queueSvc,
+			Auth:         authSvc,
+			Pool:         poolSvc,
+			Request:      requestSvc,
+			Queue:        queueSvc,
+			Contribution: contributionSvc,
+			Fulfillment:  fulfillmentSvc,
+			Delivery:     deliverySvc,
+			Impact:       impactSvc,
+			Institution:  institutionSvc,
+			Stripe:       stripeProvider,
 		}),
 		ReadTimeout:  cfg.Server.ReadTimeout,
 		WriteTimeout: cfg.Server.WriteTimeout,
 		IdleTimeout:  cfg.Server.IdleTimeout,
 	}
 
-	// Run server in a goroutine so we can listen for shutdown signals.
 	serverErr := make(chan error, 1)
 	go func() {
 		slog.Info("server starting", "addr", srv.Addr, "env", cfg.Env)
@@ -104,7 +123,6 @@ func run() error {
 		}
 	}()
 
-	// Block until interrupt or a fatal server error.
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
 
@@ -115,7 +133,6 @@ func run() error {
 		slog.Info("shutdown signal received", "signal", sig.String())
 	}
 
-	// Graceful shutdown with a 15s deadline.
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {

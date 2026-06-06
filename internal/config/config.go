@@ -15,6 +15,12 @@ type Config struct {
 	Redis  RedisConfig
 	JWT    JWTConfig
 	Log    LogConfig
+	Stripe StripeConfig
+}
+
+type StripeConfig struct {
+	SecretKey     string `mapstructure:"STRIPE_SECRET_KEY"`
+	WebhookSecret string `mapstructure:"STRIPE_WEBHOOK_SECRET"`
 }
 
 type ServerConfig struct {
@@ -92,6 +98,10 @@ func Load() (*Config, error) {
 		Log: LogConfig{
 			Level:  v.GetString("LOG_LEVEL"),
 			Format: v.GetString("LOG_FORMAT"),
+		},
+		Stripe: StripeConfig{
+			SecretKey:     v.GetString("STRIPE_SECRET_KEY"),
+			WebhookSecret: v.GetString("STRIPE_WEBHOOK_SECRET"),
 		},
 	}
 

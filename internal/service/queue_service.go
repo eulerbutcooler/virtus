@@ -77,6 +77,16 @@ func (s *QueueService) Dequeue(ctx context.Context, requestID uuid.UUID) error {
 	return nil
 }
 
+// ListAllOrdered returns all queue entries sorted by position ascending.
+// Used by the worker's fund-queue task.
+func (s *QueueService) ListAllOrdered(ctx context.Context) ([]*domain.QueueEntry, error) {
+	entries, err := s.queue.ListAllOrdered(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("queueService.ListAllOrdered: %w", err)
+	}
+	return entries, nil
+}
+
 func (s *QueueService) RecalculateAll(ctx context.Context) error {
 	entries, err := s.queue.ListAllOrdered(ctx)
 	if err != nil {

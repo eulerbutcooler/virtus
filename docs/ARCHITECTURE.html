@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtus — Architecture & Decision Log</title>
+<style>
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161b22;
+    --card:      #1c2128;
+    --border:    #30363d;
+    --text:      #e6edf3;
+    --dim:       #8b949e;
+    --green:     #3fb950;
+    --blue:      #58a6ff;
+    --yellow:    #d29922;
+    --orange:    #f0883e;
+    --red:       #f85149;
+    --purple:    #bc8cff;
+    --teal:      #39d353;
+    --code-bg:   #161b22;
+    --nav-w:     240px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    display: flex;
+  }
+
+  /* ── Sidebar ── */
+  nav {
+    width: var(--nav-w);
+    min-height: 100vh;
+    position: fixed;
+    top: 0; left: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 0;
+    overflow-y: auto;
+  }
+
+  nav .logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+
+  nav .logo h1 {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+
+  nav .logo span {
+    font-size: 12px;
+    color: var(--dim);
+    display: block;
+    margin-top: 2px;
+  }
+
+  nav a {
+    display: block;
+    padding: 6px 20px;
+    color: var(--dim);
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 0.15s;
+    border-left: 2px solid transparent;
+  }
+
+  nav a:hover { color: var(--text); }
+
+  nav .nav-section {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--dim);
+    padding: 14px 20px 4px;
+  }
+
+  /* ── Main ── */
+  main {
+    margin-left: var(--nav-w);
+    padding: 56px 64px 96px;
+    max-width: 960px;
+    width: 100%;
+  }
+
+  /* ── Typography ── */
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    padding-top: 64px;
+    color: var(--text);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 12px;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 36px 0 12px;
+    color: var(--text);
+  }
+
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 24px 0 8px;
+    color: var(--blue);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  p { margin-bottom: 14px; color: var(--dim); }
+  p strong { color: var(--text); }
+
+  ul, ol { padding-left: 20px; margin-bottom: 14px; }
+  li { color: var(--dim); margin-bottom: 4px; }
+  li strong { color: var(--text); }
+
+  a { color: var(--blue); }
+
+  /* ── Code ── */
+  code {
+    font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    font-size: 13px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--orange);
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 16px 0 24px;
+    font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  pre .k  { color: var(--purple); }
+  pre .s  { color: var(--green); }
+  pre .c  { color: var(--dim); }
+  pre .t  { color: var(--blue); }
+  pre .n  { color: var(--orange); }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+
+  .card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── Decision callout ── */
+  .decision {
+    background: #1a1f2e;
+    border: 1px solid #2d3a5e;
+    border-left: 3px solid var(--blue);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0 24px;
+  }
+
+  .decision .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+
+  .decision p { margin: 0; color: var(--dim); }
+  .decision p strong { color: var(--text); }
+
+  /* ── State machine ── */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 16px 0 24px;
+    padding: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+
+  .state {
+    padding: 5px 14px;
+    border-radius: 6px;
+    font-family: "SF Mono", monospace;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .state.grey    { background: #2d333b; color: var(--dim);    border: 1px solid var(--border); }
+  .state.blue    { background: #1a2d4a; color: var(--blue);   border: 1px solid #2d4a7a; }
+  .state.yellow  { background: #2d2500; color: var(--yellow); border: 1px solid #4a3d00; }
+  .state.green   { background: #0d2a1a; color: var(--green);  border: 1px solid #1a4d2e; }
+  .state.red     { background: #2d0d0d; color: var(--red);    border: 1px solid #4d1a1a; }
+  .state.orange  { background: #2d1a00; color: var(--orange); border: 1px solid #4d2d00; }
+  .state.purple  { background: #1e1a2d; color: var(--purple); border: 1px solid #3d2d5a; }
+
+  .arrow {
+    color: var(--border);
+    font-size: 16px;
+    font-weight: 300;
+  }
+
+  /* ── Layer diagram ── */
+  .layers {
+    margin: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .layer {
+    padding: 14px 20px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid transparent;
+  }
+
+  .layer-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    width: 110px;
+    flex-shrink: 0;
+  }
+
+  .layer-items {
+    font-size: 13px;
+    font-family: "SF Mono", monospace;
+    color: var(--dim);
+  }
+
+  .layer.l1 { background: #1a1f2e; border-color: #2d3a5e; }
+  .layer.l1 .layer-label { color: var(--blue); }
+
+  .layer.l2 { background: #1a2a1f; border-color: #2d4a35; }
+  .layer.l2 .layer-label { color: var(--green); }
+
+  .layer.l3 { background: #2d2500; border-color: #4a3d00; }
+  .layer.l3 .layer-label { color: var(--yellow); }
+
+  .layer.l4 { background: #2d1a00; border-color: #4d2d00; }
+  .layer.l4 .layer-label { color: var(--orange); }
+
+  .layer.l5 { background: #1e1a2d; border-color: #3d2d5a; }
+  .layer.l5 .layer-label { color: var(--purple); }
+
+  .layer.l6 { background: #2d0d0d; border-color: #4d1a1a; }
+  .layer.l6 .layer-label { color: var(--red); }
+
+  /* ── Grid ── */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+
+  /* ── Table ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 13px;
+  }
+
+  th {
+    text-align: left;
+    padding: 10px 14px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    color: var(--dim);
+    vertical-align: top;
+  }
+
+  td:first-child {
+    font-family: "SF Mono", monospace;
+    color: var(--orange);
+    white-space: nowrap;
+  }
+
+  td strong { color: var(--text); }
+
+  tr:hover td { background: var(--card); }
+
+  /* ── Badge ── */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+
+  .badge.done  { background: #0d2a1a; color: var(--green);  border: 1px solid #1a4d2e; }
+  .badge.todo  { background: #2d1a00; color: var(--orange); border: 1px solid #4d2d00; }
+
+  /* ── Tag ── */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: "SF Mono", monospace;
+    font-size: 11px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    color: var(--dim);
+    margin: 2px;
+  }
+
+  /* ── Callout ── */
+  .callout {
+    display: flex;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin: 16px 0 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    color: var(--dim);
+  }
+
+  .callout.warn { border-left: 3px solid var(--yellow); }
+  .callout.info { border-left: 3px solid var(--blue); }
+
+  .hero {
+    padding: 40px 0 20px;
+  }
+  .hero h1 {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+  .hero p {
+    font-size: 17px;
+    color: var(--dim);
+    max-width: 560px;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 8px 0 0;
+  }
+
+  /* ── Money flow ── */
+  .money-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 20px 0;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .money-step {
+    flex: 1;
+    padding: 16px 14px;
+    background: var(--card);
+    text-align: center;
+  }
+
+  .money-step + .money-step {
+    border-left: 1px solid var(--border);
+  }
+
+  .money-step .icon { font-size: 22px; margin-bottom: 6px; }
+  .money-step .label { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 0.06em; }
+  .money-step .name { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 4px; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ SIDEBAR ════════════════ -->
+<nav>
+  <div class="logo">
+    <h1>Virtus</h1>
+    <span>Architecture &amp; Decision Log</span>
+  </div>
+
+  <div class="nav-section">Overview</div>
+  <a href="#what">What is Virtus?</a>
+  <a href="#stack">Tech Stack</a>
+  <a href="#structure">Project Structure</a>
+
+  <div class="nav-section">Backend</div>
+  <a href="#arch">Architecture Layers</a>
+  <a href="#domain">Domain Models</a>
+  <a href="#lifecycle">Request Lifecycle</a>
+  <a href="#auth">Auth &amp; Security</a>
+  <a href="#money">Money Flow</a>
+  <a href="#queue">Queue System</a>
+  <a href="#worker">Worker</a>
+  <a href="#http">HTTP Layer</a>
+  <a href="#db">Database Design</a>
+
+  <div class="nav-section">Operations</div>
+  <a href="#config">Configuration</a>
+  <a href="#decisions">Decision Log</a>
+  <a href="#remaining">What Remains</a>
+</nav>
+
+<!-- ════════════════ MAIN ════════════════ -->
+<main>
+
+  <div class="hero">
+    <h1>Virtus</h1>
+    <p>A transparent, participation-based community fulfillment platform. Architecture reference and decision log for every choice made in the codebase.</p>
+  </div>
+
+  <!-- ── WHAT ── -->
+  <h2 id="what">What is Virtus?</h2>
+
+  <p>Virtus is a <strong>mutual support ecosystem</strong> where members both contribute to a shared pool and submit requests for essential items (laptops, mobility aids, educational tools, etc.). Requests are processed through a transparent, rule-based queue. When the pool accumulates enough funds, requests are automatically funded in order. Every step — from contribution to delivery to long-term impact — is tracked and publicly visible.</p>
+
+  <p>The key distinction from charity: <strong>every participant is simultaneously a contributor and a potential beneficiary</strong>. Access is earned through participation, not proof of hardship. This preserves dignity while creating a self-sustaining system.</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🎯 Core Loop</div>
+      <ol style="margin:0; padding-left:18px;">
+        <li>Member joins and contributes to the pool</li>
+        <li>Member submits a request for an item</li>
+        <li>Admin verifies and queues the request</li>
+        <li>Worker funds requests as the pool fills</li>
+        <li>Admin procures, ships, and verifies delivery</li>
+        <li>Member reports impact; cycle continues</li>
+      </ol>
+    </div>
+    <div class="card">
+      <div class="card-title">🏛️ Three Actor Types</div>
+      <ul style="margin:0; padding-left:18px;">
+        <li><strong>member</strong> — individual contributor/beneficiary</li>
+        <li><strong>admin</strong> — verifies requests, manages procurement</li>
+        <li><strong>institution</strong> — corporate/NGO/government partner, contributes directly to the pool with tagging for ESG reporting</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ── STACK ── -->
+  <h2 id="stack">Tech Stack</h2>
+
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>Why</th></tr>
+    <tr>
+      <td>API server</td>
+      <td><strong>Go 1.25</strong></td>
+      <td>Fast, small binaries, excellent concurrency primitives, stdlib-first. No frameworks needed for a JSON API.</td>
+    </tr>
+    <tr>
+      <td>HTTP router</td>
+      <td><strong>chi v5</strong></td>
+      <td>Lightweight, stdlib-compatible, idiomatic middleware chaining. No magic, no code generation.</td>
+    </tr>
+    <tr>
+      <td>Database</td>
+      <td><strong>PostgreSQL + pgx v5</strong></td>
+      <td>ACID transactions for financial data. pgx is the fastest native Go driver; pgxpool for connection pooling.</td>
+    </tr>
+    <tr>
+      <td>Query layer</td>
+      <td><strong>sqlc</strong></td>
+      <td>Type-safe generated Go from raw SQL. Full control over queries; no ORM magic or N+1 surprises.</td>
+    </tr>
+    <tr>
+      <td>Cache / sessions</td>
+      <td><strong>Redis</strong></td>
+      <td>Refresh token store (per-session invalidation) and future rate limiting. Simple key-value ops only.</td>
+    </tr>
+    <tr>
+      <td>Payments</td>
+      <td><strong>Stripe</strong></td>
+      <td>PaymentIntents API for card collection; webhooks for async payment confirmation. Industry standard.</td>
+    </tr>
+    <tr>
+      <td>Auth</td>
+      <td><strong>JWT (HS256)</strong></td>
+      <td>Stateless access tokens (15m TTL) + stateful refresh tokens stored in Redis (7d TTL).</td>
+    </tr>
+    <tr>
+      <td>Config</td>
+      <td><strong>Viper + .env</strong></td>
+      <td>12-factor config: env vars with .env file fallback for local dev, no config in source.</td>
+    </tr>
+    <tr>
+      <td>Logging</td>
+      <td><strong>log/slog</strong></td>
+      <td>Go stdlib structured logging. Zero dependencies, JSON output in production.</td>
+    </tr>
+    <tr>
+      <td>Validation</td>
+      <td><strong>go-playground/validator</strong></td>
+      <td>Struct tag validation with field-level error messages returned to clients.</td>
+    </tr>
+    <tr>
+      <td>Frontend</td>
+      <td><strong>Next.js (planned)</strong></td>
+      <td>Directory structure scaffolded. Not yet implemented.</td>
+    </tr>
+  </table>
+
+  <!-- ── STRUCTURE ── -->
+  <h2 id="structure">Project Structure</h2>
+
+  <pre>virtus/
+├── cmd/
+│   ├── api/main.go          <span class="c"># API server binary</span>
+│   └── worker/main.go       <span class="c"># Background worker binary</span>
+│
+├── internal/
+│   ├── config/              <span class="c"># Viper config loader</span>
+│   ├── domain/              <span class="c"># Pure business types + repository interfaces</span>
+│   ├── handler/
+│   │   ├── middleware/      <span class="c"># auth, logger</span>
+│   │   ├── response/        <span class="c"># JSON envelope helpers</span>
+│   │   ├── v1/              <span class="c"># HTTP handlers (one file per domain area)</span>
+│   │   └── router.go        <span class="c"># Route wiring</span>
+│   ├── repository/
+│   │   ├── postgres/        <span class="c"># sqlc-generated code + repo implementations</span>
+│   │   └── redis/           <span class="c"># Cache + rate limiter</span>
+│   ├── service/             <span class="c"># Business logic (one file per domain area)</span>
+│   └── worker/tasks/        <span class="c"># Background task implementations</span>
+│
+├── migrations/              <span class="c"># Goose-style SQL migrations (up + down)</span>
+├── pkg/
+│   ├── crypto/              <span class="c"># bcrypt + secure token generation</span>
+│   ├── logger/              <span class="c"># slog initialiser</span>
+│   ├── pagination/          <span class="c"># Page/Offset helpers</span>
+│   ├── stripe/              <span class="c"># Stripe PaymentProvider + webhook parser</span>
+│   └── validator/           <span class="c"># go-playground wrapper with field errors</span>
+│
+├── web/                     <span class="c"># Next.js frontend (directory scaffold only)</span>
+├── docs/                    <span class="c"># This file lives here</span>
+├── sqlc.yaml
+├── go.mod / go.sum
+└── ROADMAP.md / KARPATHY.md</pre>
+
+  <div class="decision">
+    <div class="label">Decision — Two binaries</div>
+    <p>The API server and worker are <strong>separate binaries</strong> compiled from the same module. They share all internal packages but have independent lifecycles. This means you can scale, restart, and deploy them independently. The worker never touches HTTP; the API never runs tickers.</p>
+  </div>
+
+  <!-- ── ARCHITECTURE ── -->
+  <h2 id="arch">Architecture Layers</h2>
+
+  <p>Strict dependency direction: <strong>outer layers depend on inner layers, never the reverse</strong>. Domain knows nothing about HTTP, SQL, or Stripe.</p>
+
+  <div class="layers">
+    <div class="layer l1">
+      <div class="layer-label">HTTP / CLI</div>
+      <div class="layer-items">handlers, router, middleware, cmd/api, cmd/worker</div>
+    </div>
+    <div class="layer l2" style="margin-left:20px;">
+      <div class="layer-label">Service</div>
+      <div class="layer-items">auth, pool, queue, request, contribution, fulfillment, delivery, impact, institution</div>
+    </div>
+    <div class="layer l3" style="margin-left:40px;">
+      <div class="layer-label">Repository</div>
+      <div class="layer-items">postgres (sqlc), redis cache, stripe provider</div>
+    </div>
+    <div class="layer l4" style="margin-left:60px;">
+      <div class="layer-label">Domain</div>
+      <div class="layer-items">types, interfaces, sentinel errors — zero external imports</div>
+    </div>
+    <div class="layer l5" style="margin-left:80px;">
+      <div class="layer-label">Database</div>
+      <div class="layer-items">PostgreSQL + Redis</div>
+    </div>
+  </div>
+
+  <div class="decision">
+    <div class="label">Decision — Domain-centric design</div>
+    <p>All repository interfaces live in <code>internal/domain</code>, not in the repository package. This means services depend on <strong>abstractions</strong>, not concrete implementations. Swapping PostgreSQL for another store or mocking for tests requires zero changes in service code.</p>
+  </div>
+
+  <!-- ── DOMAIN ── -->
+  <h2 id="domain">Domain Models</h2>
+
+  <p>Ten pure Go structs, each with a matching repository interface. No ORMs, no struct tags for SQL — the domain layer has <strong>no knowledge of how data is persisted</strong>.</p>
+
+  <table>
+    <tr><th>Model</th><th>Key Fields</th><th>Purpose</th></tr>
+    <tr>
+      <td>User</td>
+      <td>id, email, name, role, password_hash, verified</td>
+      <td>Platform participant. Role is one of <code>member</code>, <code>admin</code>, <code>institution</code>.</td>
+    </tr>
+    <tr>
+      <td>Pool</td>
+      <td>id, balance, total_in, total_out, currency</td>
+      <td>The single global money pool. One row; <code>GlobalPoolID</code> is a well-known UUID constant.</td>
+    </tr>
+    <tr>
+      <td>Contribution</td>
+      <td>user_id, pool_id, amount, currency, status, stripe_pi_id</td>
+      <td>A member's payment. Starts <code>pending</code>, moves to <code>completed</code> via Stripe webhook.</td>
+    </tr>
+    <tr>
+      <td>Request</td>
+      <td>user_id, item_name, urgency, estimated_cost, status, rejection_note</td>
+      <td>A member's item request. Has a 9-state lifecycle (see below).</td>
+    </tr>
+    <tr>
+      <td>QueueEntry</td>
+      <td>request_id, position, funding_progress, estimated_fulfillment</td>
+      <td>A request's place in the transparent queue. One-to-one with verified requests.</td>
+    </tr>
+    <tr>
+      <td>Fulfillment</td>
+      <td>request_id, vendor_name, vendor_ref, actual_cost, procurement_status</td>
+      <td>Tracks procurement from vendor selection through delivery. Created when admin starts procuring a funded request.</td>
+    </tr>
+    <tr>
+      <td>Delivery</td>
+      <td>fulfillment_id, tracking_number, carrier, proof_photo_url, status</td>
+      <td>Physical shipment tracking. Verified with a photo proof URL.</td>
+    </tr>
+    <tr>
+      <td>ImpactRecord</td>
+      <td>delivery_id, user_id, interval_label, satisfaction_score, metrics</td>
+      <td>Follow-up surveys at 30/90/180 days post-delivery. Demonstrates real-world outcomes.</td>
+    </tr>
+    <tr>
+      <td>Institution</td>
+      <td>user_id, name, type, contact_email, esg_goals, verified</td>
+      <td>Corporate/NGO/government partner profile. Links to institutional contributions.</td>
+    </tr>
+    <tr>
+      <td>InstitutionalContribution</td>
+      <td>institution_id, amount, currency, category_tag, region_tag</td>
+      <td>Direct pool contributions from institutions. No Stripe — recorded as immediately completed.</td>
+    </tr>
+  </table>
+
+  <!-- ── LIFECYCLE ── -->
+  <h2 id="lifecycle">Request Lifecycle</h2>
+
+  <p>Every request is a state machine. Transitions are enforced at the service layer (not just the database) to keep invalid state changes impossible regardless of how the repo is called.</p>
+
+  <h3>The 9 States</h3>
+
+  <div class="flow">
+    <div class="state grey">submitted</div>
+    <div class="arrow">→</div>
+    <div class="state blue">verified</div>
+    <div class="arrow">→</div>
+    <div class="state blue">queued</div>
+    <div class="arrow">→</div>
+    <div class="state yellow">funded</div>
+    <div class="arrow">→</div>
+    <div class="state orange">procuring</div>
+    <div class="arrow">→</div>
+    <div class="state purple">delivered</div>
+    <div class="arrow">→</div>
+    <div class="state green">completed</div>
+  </div>
+  <div class="flow" style="margin-top:-12px; border-top:none; border-radius:0 0 10px 10px; background: transparent; padding: 8px 20px;">
+    <span style="font-size:12px; color:var(--dim);">Also possible from submitted/verified:</span>
+    <div class="state red" style="margin-left:8px;">rejected</div>
+  </div>
+
+  <table>
+    <tr><th>Transition</th><th>Who triggers it</th><th>What happens</th></tr>
+    <tr>
+      <td>→ submitted</td>
+      <td>Member (POST /requests)</td>
+      <td>Request created and immediately submitted (no draft-save step in MVP).</td>
+    </tr>
+    <tr>
+      <td>→ verified → queued</td>
+      <td>Admin (POST /admin/requests/:id/verify)</td>
+      <td>Admin approves the request. A QueueEntry is created. Status advances to <code>queued</code> in one call.</td>
+    </tr>
+    <tr>
+      <td>→ rejected</td>
+      <td>Admin (POST /admin/requests/:id/reject)</td>
+      <td>Admin rejects with a note. If queued, the QueueEntry is deleted (best-effort).</td>
+    </tr>
+    <tr>
+      <td>→ funded</td>
+      <td><strong>Worker</strong> (fund_queue task)</td>
+      <td>Automatic. Worker detects pool balance ≥ estimated cost. Marks funded and dequeues.</td>
+    </tr>
+    <tr>
+      <td>→ procuring</td>
+      <td>Admin (POST /admin/fulfillments)</td>
+      <td>Admin begins procurement. A Fulfillment record is created.</td>
+    </tr>
+    <tr>
+      <td>→ delivered</td>
+      <td>Admin (POST /admin/deliveries/:id/verify)</td>
+      <td>Admin uploads proof photo. Delivery verified, fulfillment and request status cascade updated.</td>
+    </tr>
+    <tr>
+      <td>→ completed</td>
+      <td>Future / manual</td>
+      <td>After impact follow-up period. Not yet automated.</td>
+    </tr>
+  </table>
+
+  <div class="decision">
+    <div class="label">Decision — Skip draft status</div>
+    <p>The domain defines a <code>draft</code> status but the API submits requests directly as <code>submitted</code>. This avoids a save-then-submit two-step flow in MVP. Draft exists in the schema so members can eventually save incomplete requests before submitting — the service and SQL already support it.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Decision — Worker funds, not the API</div>
+    <p>Funding is not triggered by a webhook or a direct API call — it is discovered by the polling worker. This makes it <strong>resilient</strong>: if a contribution's webhook fires while the queue is being evaluated, the next poll catches it. There is no race condition between "payment completed" and "request funded" events.</p>
+  </div>
+
+  <!-- ── AUTH ── -->
+  <h2 id="auth">Auth &amp; Security</h2>
+
+  <h3>Token Strategy</h3>
+
+  <p>Two-token pattern: short-lived <strong>access tokens</strong> (15 minutes) and longer-lived <strong>refresh tokens</strong> (7 days). Access tokens are stateless JWTs validated by the middleware without a DB hit. Refresh tokens are stored in Redis so they can be <strong>individually invalidated</strong> — logging out one device doesn't affect others.</p>
+
+  <div class="card">
+    <div class="card-title">JWT Claims payload</div>
+    <pre style="margin:8px 0 0; padding:12px; font-size:12px;">{
+  "uid":  "uuid-of-user",
+  "role": "member",          <span class="c">// embedded so middleware avoids a DB call</span>
+  "aud":  "virtus:access",   <span class="c">// "virtus:refresh" for refresh tokens</span>
+  "jti":  "random-16-bytes", <span class="c">// used as Redis key suffix for RT invalidation</span>
+  "sub":  "uuid-of-user",
+  "iat":  1234567890,
+  "exp":  1234567890
+}</pre>
+  </div>
+
+  <h4>Why audience claim?</h4>
+  <p>Access and refresh tokens have different <code>aud</code> claims (<code>virtus:access</code> vs <code>virtus:refresh</code>). The parser enforces this, making it impossible to use a refresh token where an access token is expected and vice versa.</p>
+
+  <h4>Redis key pattern</h4>
+  <p>Each refresh token is stored at <code>rt:{user_id}:{jti}</code>. On logout, only that specific JTI is deleted. On refresh, the old JTI is deleted and a new pair is issued. This allows per-session logout without forcing all sessions to expire.</p>
+
+  <h3>Role-Based Access</h3>
+
+  <p>Roles are embedded in the JWT so <code>RequireRole(domain.RoleAdmin)</code> middleware needs no database call. Three roles:</p>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span style="color:var(--dim)">member</span></div>
+      <p style="margin:0; font-size:13px;">Default role. Can submit requests, contribute to the pool, view their own data, record impact.</p>
+    </div>
+    <div class="card">
+      <div class="card-title"><span style="color:var(--orange)">institution</span></div>
+      <p style="margin:0; font-size:13px;">Like member but can also register an institution profile and make tagged institutional contributions.</p>
+    </div>
+  </div>
+  <div class="card" style="margin-top:-4px;">
+    <div class="card-title"><span style="color:var(--red)">admin</span></div>
+    <p style="margin:0; font-size:13px;">Can verify/reject requests, begin fulfillments, ship and verify deliveries, verify institutions. All admin routes are grouped under <code>/admin/</code> and gated by <code>RequireRole(RoleAdmin)</code>.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Decision — Passwords with bcrypt</div>
+    <p>bcrypt is used via <code>pkg/crypto</code> with Go's <code>golang.org/x/crypto/bcrypt</code>. The cost factor defaults to 12 (bcrypt default). Password hashes are never returned in JSON responses — the <code>User</code> struct uses <code>json:"-"</code> on <code>PasswordHash</code>.</p>
+  </div>
+
+  <!-- ── MONEY ── -->
+  <h2 id="money">Money Flow</h2>
+
+  <p>Money moves through four actors: <strong>Member → Stripe → Pool → Fulfillment</strong>. Each step is atomic and logged.</p>
+
+  <div class="money-flow">
+    <div class="money-step">
+      <div class="icon">👤</div>
+      <div class="label">Step 1</div>
+      <div class="name">Member initiates</div>
+    </div>
+    <div class="money-step">
+      <div class="icon">⚡</div>
+      <div class="label">Step 2</div>
+      <div class="name">Stripe PaymentIntent</div>
+    </div>
+    <div class="money-step">
+      <div class="icon">🔔</div>
+      <div class="label">Step 3</div>
+      <div class="name">Webhook fires</div>
+    </div>
+    <div class="money-step">
+      <div class="icon">🏦</div>
+      <div class="label">Step 4</div>
+      <div class="name">Pool credited</div>
+    </div>
+    <div class="money-step">
+      <div class="icon">📦</div>
+      <div class="label">Step 5</div>
+      <div class="name">Pool debited (procurement)</div>
+    </div>
+  </div>
+
+  <h3>Step-by-step</h3>
+
+  <ol>
+    <li><strong>POST /contributions</strong> — Member specifies amount + currency. The API calls <code>ContributionService.Initiate</code>, which creates a Stripe PaymentIntent and a <code>pending</code> Contribution row (with <code>stripe_pi_id</code> stored). The <code>client_secret</code> is returned to the frontend.</li>
+    <li><strong>Frontend confirms payment</strong> — The browser uses Stripe.js + the client secret to collect the card and confirm. This never touches the Virtus backend directly.</li>
+    <li><strong>POST /webhooks/stripe</strong> — Stripe fires a signed webhook. The handler reads the raw body, verifies the <code>Stripe-Signature</code> header using the webhook secret, then routes by event type.</li>
+    <li><strong>payment_intent.succeeded</strong> → <code>ContributionService.Complete</code> runs inside a DB transaction: marks the contribution <code>completed</code> and <code>CreditPool</code> atomically. If either step fails, both roll back.</li>
+    <li><strong>payment_intent.payment_failed / canceled</strong> → <code>ContributionService.Fail</code> marks the contribution <code>failed</code>. The pool is untouched.</li>
+    <li><strong>Procurement</strong> — When an admin sets <code>actual_cost</code> on a fulfillment, the pool is debited by that amount. This is separate from estimated cost (actual may differ).</li>
+  </ol>
+
+  <div class="decision">
+    <div class="label">Decision — Idempotent webhook handler</div>
+    <p>Stripe can deliver the same webhook event more than once (at-least-once delivery). <code>ContributionService.Complete</code> checks if the contribution is already <code>completed</code> and returns <code>nil</code> without re-crediting the pool. The webhook always returns HTTP 200 for processed events so Stripe doesn't retry unnecessarily.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Decision — PaymentProvider interface</div>
+    <p><code>ContributionService</code> depends on a <code>PaymentProvider</code> interface, not on <code>*stripe.Provider</code> directly. This means the service is testable without hitting Stripe, and swapping to another payment processor (Dodo Payments, Braintree, etc.) requires only a new implementation of two methods: <code>CreateIntent</code> and (separately) <code>ParseWebhook</code>.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Decision — Webhook is a public route</div>
+    <p>The Stripe webhook at <code>POST /webhooks/stripe</code> is registered <em>outside</em> the <code>RequireAuth</code> middleware group. Stripe cannot send a Bearer token. Security is provided by signature verification (<code>webhook.ConstructEvent</code>) using the webhook secret — which is equivalent in strength to a shared secret auth scheme.</p>
+  </div>
+
+  <!-- ── QUEUE ── -->
+  <h2 id="queue">Queue System</h2>
+
+  <p>The queue is the transparency mechanism of the platform. Every verified request gets a <code>QueueEntry</code> with a position number. Members can see exactly where they stand and estimate when they'll be funded.</p>
+
+  <h3>Queue Rules</h3>
+  <ul>
+    <li><strong>FIFO ordering</strong> — Positions are assigned by insertion order (time of verification). The queue started with a priority score system (see migration 10) but this was dropped in favour of pure FIFO to prevent gaming the score.</li>
+    <li><strong>One-to-one</strong> — A request can appear in the queue exactly once (<code>UNIQUE</code> constraint on <code>request_id</code>).</li>
+    <li><strong>Dequeued on funding</strong> — When the worker marks a request funded, it is removed from the queue. The admin then begins procurement separately.</li>
+    <li><strong>Dequeued on rejection</strong> — If an admin rejects a queued request, it is removed (best-effort — the request status update always succeeds even if the dequeue call fails).</li>
+  </ul>
+
+  <h3>Funding Progress Field</h3>
+  <p>Each QueueEntry has a <code>funding_progress</code> float. Currently written to <code>0.0</code> on creation and set to <code>100.0</code> (implicitly, by removal) on funding. This field is the hook for a future partial-funding display — e.g., showing the pool is "62% of the way" to covering a request.</p>
+
+  <div class="decision">
+    <div class="label">Decision — Dropped priority score (migration 10)</div>
+    <p>Migration 5 added a <code>priority_score</code> column and index. Migration 10 drops both. The score was intended to weight urgency, wait time, and contribution history — but this creates perverse incentives (members game urgency levels) and undermines the "fair queue" promise. Pure FIFO is simpler, more legible, and harder to manipulate.</p>
+  </div>
+
+  <!-- ── WORKER ── -->
+  <h2 id="worker">Worker</h2>
+
+  <p>A separate binary (<code>cmd/worker</code>) that runs three periodic background tasks. No external job queue — just <code>time.Ticker</code> goroutines with graceful shutdown via context cancellation.</p>
+
+  <table>
+    <tr><th>Task</th><th>Interval</th><th>What it does</th></tr>
+    <tr>
+      <td>fund_queue</td>
+      <td>30 seconds</td>
+      <td>Reads pool balance, walks queue FIFO, calls <code>RequestService.MarkFunded</code> for each affordable request. Stops at the first it can't cover. Logs each funding event.</td>
+    </tr>
+    <tr>
+      <td>impact_reminder</td>
+      <td>24 hours</td>
+      <td>Joins deliveries → fulfillments → requests. Finds verified deliveries &gt;30 days old missing a 30/90/180-day impact record. Logs each gap for admin follow-up.</td>
+    </tr>
+    <tr>
+      <td>delivery_watchdog</td>
+      <td>24 hours</td>
+      <td>Finds deliveries in <code>in_transit</code> with <code>updated_at</code> &gt;14 days ago. Logs a warning per stale delivery. Does NOT auto-fail — human decision required.</td>
+    </tr>
+  </table>
+
+  <h3>Task Runner Pattern</h3>
+  <pre><span class="c">// runPeriodic in cmd/worker/main.go</span>
+<span class="k">func</span> <span class="n">runPeriodic</span>(ctx, interval, name, fn) {
+    run()              <span class="c">// run immediately on start</span>
+    ticker := Ticker(interval)
+    <span class="k">for</span> {
+        <span class="k">select</span> {
+        <span class="k">case</span> &lt;-ctx.Done(): <span class="k">return</span>
+        <span class="k">case</span> &lt;-ticker.C:  run()
+        }
+    }
+}</pre>
+
+  <p>Each task is isolated: an error in one task logs and is skipped; the ticker fires again on the next interval. The worker never crashes on a task failure.</p>
+
+  <div class="decision">
+    <div class="label">Decision — No asynq / River / job queue</div>
+    <p>We considered asynq (Redis-backed) and River (Postgres-backed). Both add significant complexity for what are essentially three polling loops. Per the simplicity principle: the current tasks don't need distributed scheduling, retry queues, or job dashboards. If the platform grows to need guaranteed-delivery async jobs (e.g., email notifications), asynq can be introduced at that point without structural changes to the rest of the codebase.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Decision — Worker uses pgxpool directly for watchdog queries</div>
+    <p>The impact_reminder and delivery_watchdog tasks run queries that join multiple tables in ways not covered by the existing <code>domain.DeliveryRepository</code> interface. Rather than extending the interface (which would require implementing it in the repo, adding SQL, regenerating sqlc), these tasks hold a <code>*pgxpool.Pool</code> and run raw queries. This is acceptable because they are read-only diagnostic queries, not business logic.</p>
+  </div>
+
+  <!-- ── HTTP ── -->
+  <h2 id="http">HTTP Layer</h2>
+
+  <h3>Response Envelope</h3>
+  <p>Every response is wrapped in a consistent JSON envelope:</p>
+  <pre>{
+  <span class="s">"data"</span>:  { ... },   <span class="c">// success payload</span>
+  <span class="s">"error"</span>: {           <span class="c">// only on failure</span>
+    <span class="s">"message"</span>: <span class="s">"..."</span>,
+    <span class="s">"fields"</span>:  { ... }  <span class="c">// only for 422 validation errors</span>
+  },
+  <span class="s">"meta"</span>:  { ... }    <span class="c">// pagination info on list endpoints</span>
+}</pre>
+
+  <h3>Error Mapping</h3>
+  <p>Service errors are sentinel values in <code>domain/errors.go</code>. <code>response.FromError</code> maps them to HTTP status codes:</p>
+
+  <table>
+    <tr><th>Domain Error</th><th>HTTP Status</th></tr>
+    <tr><td>ErrNotFound</td><td>404 Not Found</td></tr>
+    <tr><td>ErrConflict</td><td>409 Conflict</td></tr>
+    <tr><td>ErrUnauthorized</td><td>401 Unauthorized</td></tr>
+    <tr><td>ErrForbidden</td><td>403 Forbidden</td></tr>
+    <tr><td>ErrInvalidInput</td><td>400 Bad Request</td></tr>
+    <tr><td>ErrInsufficientFunds</td><td>422 Unprocessable Entity</td></tr>
+    <tr><td>ErrInvalidState</td><td>409 Conflict</td></tr>
+    <tr><td>ValidationErrors</td><td>422 + per-field breakdown</td></tr>
+    <tr><td>anything else</td><td>500 Internal Server Error (logged)</td></tr>
+  </table>
+
+  <h3>Route Map</h3>
+
+  <h4>Public</h4>
+  <div class="tag">GET /healthz</div>
+  <div class="tag">POST /webhooks/stripe</div>
+  <div class="tag">POST /api/v1/auth/register</div>
+  <div class="tag">POST /api/v1/auth/login</div>
+  <div class="tag">POST /api/v1/auth/refresh</div>
+  <div class="tag">POST /api/v1/auth/logout</div>
+
+  <h4>Authenticated (member+)</h4>
+  <div class="tag">GET /api/v1/me</div>
+  <div class="tag">GET /api/v1/pool</div>
+  <div class="tag">GET /api/v1/queue</div>
+  <div class="tag">GET /api/v1/queue/:requestID</div>
+  <div class="tag">POST /api/v1/requests</div>
+  <div class="tag">GET /api/v1/requests</div>
+  <div class="tag">GET /api/v1/requests/:id</div>
+  <div class="tag">PATCH /api/v1/requests/:id</div>
+  <div class="tag">DELETE /api/v1/requests/:id</div>
+  <div class="tag">POST /api/v1/contributions</div>
+  <div class="tag">GET /api/v1/contributions</div>
+  <div class="tag">GET /api/v1/contributions/total</div>
+  <div class="tag">GET /api/v1/contributions/:id</div>
+  <div class="tag">GET /api/v1/fulfillments/:id</div>
+  <div class="tag">GET /api/v1/fulfillments/request/:requestID</div>
+  <div class="tag">GET /api/v1/deliveries/:id</div>
+  <div class="tag">GET /api/v1/deliveries/fulfillment/:fulfillmentID</div>
+  <div class="tag">POST /api/v1/impact</div>
+  <div class="tag">GET /api/v1/impact</div>
+  <div class="tag">GET /api/v1/impact/:id</div>
+  <div class="tag">GET /api/v1/impact/delivery/:deliveryID</div>
+  <div class="tag">POST /api/v1/institutions</div>
+  <div class="tag">GET /api/v1/institutions/me</div>
+  <div class="tag">GET /api/v1/institutions/:id</div>
+  <div class="tag">PATCH /api/v1/institutions/:id</div>
+  <div class="tag">POST /api/v1/institutions/:id/contributions</div>
+  <div class="tag">GET /api/v1/institutions/:id/contributions</div>
+
+  <h4>Admin only</h4>
+  <div class="tag">GET /api/v1/admin/requests</div>
+  <div class="tag">POST /api/v1/admin/requests/:id/verify</div>
+  <div class="tag">POST /api/v1/admin/requests/:id/reject</div>
+  <div class="tag">POST /api/v1/admin/fulfillments</div>
+  <div class="tag">GET /api/v1/admin/fulfillments</div>
+  <div class="tag">PATCH /api/v1/admin/fulfillments/:id</div>
+  <div class="tag">POST /api/v1/admin/fulfillments/:id/cancel</div>
+  <div class="tag">POST /api/v1/admin/deliveries</div>
+  <div class="tag">POST /api/v1/admin/deliveries/:id/verify</div>
+  <div class="tag">POST /api/v1/admin/deliveries/:id/fail</div>
+  <div class="tag">POST /api/v1/admin/institutions/:id/verify</div>
+
+  <!-- ── DB ── -->
+  <h2 id="db">Database Design</h2>
+
+  <h3>Schema overview</h3>
+
+  <p>Ten tables, all using <code>UUID PRIMARY KEY DEFAULT gen_random_uuid()</code>. Timestamps are <code>TIMESTAMPTZ</code> (timezone-aware). Monetary amounts are <code>NUMERIC(15,2)</code> — never <code>FLOAT</code>, which cannot represent decimal values exactly.</p>
+
+  <table>
+    <tr><th>Table</th><th>Notable constraints</th></tr>
+    <tr>
+      <td>users</td>
+      <td><code>email UNIQUE</code>, <code>role</code> is a Postgres ENUM</td>
+    </tr>
+    <tr>
+      <td>pools</td>
+      <td>Single row seeded at startup. <code>balance CHECK (balance >= 0)</code> prevents overdraft at the DB level.</td>
+    </tr>
+    <tr>
+      <td>contributions</td>
+      <td><code>stripe_pi_id UNIQUE</code> prevents duplicate webhook processing. <code>amount CHECK (amount > 0)</code>.</td>
+    </tr>
+    <tr>
+      <td>requests</td>
+      <td><code>status</code> and <code>urgency</code> are Postgres ENUMs. <code>estimated_cost CHECK > 0</code>.</td>
+    </tr>
+    <tr>
+      <td>queue_entries</td>
+      <td><code>request_id UNIQUE</code> (one queue slot per request). <code>ON DELETE CASCADE</code> — deleting a request clears its queue entry.</td>
+    </tr>
+    <tr>
+      <td>fulfillments</td>
+      <td><code>request_id UNIQUE</code>. <code>ON DELETE RESTRICT</code> — can't delete a request that has a fulfillment in progress.</td>
+    </tr>
+    <tr>
+      <td>deliveries</td>
+      <td><code>verified_at</code>, <code>delivered_at</code>, <code>verified_by</code> are nullable; set only when verified.</td>
+    </tr>
+    <tr>
+      <td>impact_records</td>
+      <td>No uniqueness on <code>(delivery_id, interval_label)</code> — multiple records per interval are allowed (the worker checks for existence in Go, not at the DB level).</td>
+    </tr>
+    <tr>
+      <td>institutions</td>
+      <td><code>user_id UNIQUE</code> — one institution per user account. <code>verified</code> flag set by admin.</td>
+    </tr>
+    <tr>
+      <td>institutional_contributions</td>
+      <td>Separate from <code>contributions</code> to carry institutional metadata (<code>category_tag</code>, <code>region_tag</code>, <code>notes</code>) for ESG reporting.</td>
+    </tr>
+  </table>
+
+  <h3>sqlc</h3>
+  <p>All queries are written by hand in <code>internal/repository/postgres/queries/*.sql</code> and compiled to type-safe Go by sqlc. The generated code lives in <code>internal/repository/postgres/db/</code> and is <strong>never edited manually</strong>. Repository implementations in <code>internal/repository/postgres/</code> wrap the generated code, translating between <code>dbgen.*</code> types and <code>domain.*</code> types.</p>
+
+  <div class="decision">
+    <div class="label">Decision — NUMERIC not FLOAT for money</div>
+    <p>IEEE 754 floating point cannot represent 0.10 exactly. All monetary columns use <code>NUMERIC(15,2)</code>. Go maps this to <code>float64</code> via pgx's numeric codec, which is sufficient for display and comparison. A future hardening step would use a <code>decimal.Decimal</code> type in Go as well.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Decision — ON DELETE RESTRICT on financial rows</div>
+    <p>Contributions and fulfillments use <code>ON DELETE RESTRICT</code> on their foreign keys. You cannot delete a user who has contributed, or a request that has been procured. This preserves the audit trail. The queue uses <code>ON DELETE CASCADE</code> because a queue entry has no independent value once its request is gone.</p>
+  </div>
+
+  <!-- ── CONFIG ── -->
+  <h2 id="config">Configuration</h2>
+
+  <p>All configuration is via environment variables (or a <code>.env</code> file for local dev). No config in source.</p>
+
+  <table>
+    <tr><th>Variable</th><th>Default</th><th>Required</th></tr>
+    <tr><td>APP_ENV</td><td>development</td><td></td></tr>
+    <tr><td>SERVER_HOST</td><td>0.0.0.0</td><td></td></tr>
+    <tr><td>SERVER_PORT</td><td>8080</td><td></td></tr>
+    <tr><td>DB_HOST</td><td>localhost</td><td></td></tr>
+    <tr><td>DB_PORT</td><td>5432</td><td></td></tr>
+    <tr><td>DB_USER</td><td>virtus</td><td></td></tr>
+    <tr><td>DB_NAME</td><td>virtus</td><td></td></tr>
+    <tr><td>DB_PASSWORD</td><td>—</td><td>✓</td></tr>
+    <tr><td>DB_SSLMODE</td><td>disable</td><td></td></tr>
+    <tr><td>REDIS_ADDR</td><td>localhost:6379</td><td></td></tr>
+    <tr><td>REDIS_PASSWORD</td><td>""</td><td></td></tr>
+    <tr><td>REDIS_DB</td><td>0</td><td></td></tr>
+    <tr><td>JWT_SECRET</td><td>—</td><td>✓</td></tr>
+    <tr><td>JWT_ACCESS_TTL</td><td>15m</td><td></td></tr>
+    <tr><td>JWT_REFRESH_TTL</td><td>168h (7 days)</td><td></td></tr>
+    <tr><td>STRIPE_SECRET_KEY</td><td>—</td><td>✓ for payments</td></tr>
+    <tr><td>STRIPE_WEBHOOK_SECRET</td><td>—</td><td>✓ for webhooks</td></tr>
+    <tr><td>LOG_LEVEL</td><td>info</td><td></td></tr>
+    <tr><td>LOG_FORMAT</td><td>json</td><td></td></tr>
+  </table>
+
+  <!-- ── DECISIONS ── -->
+  <h2 id="decisions">Decision Log</h2>
+
+  <p>Every significant design choice, and the reasoning behind it.</p>
+
+  <h3>Architecture</h3>
+
+  <div class="decision">
+    <div class="label">Pure domain layer</div>
+    <p>All repository contracts (<code>UserRepository</code>, <code>PoolRepository</code>, etc.) are interfaces defined in <code>internal/domain</code>, not in the repository package. This is a deliberate inversion: the business logic defines what it needs; the infrastructure provides it. Services can be tested by injecting mock repos with no framework or build tags required.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Sentinel errors, not error codes</div>
+    <p>Domain errors are typed sentinels: <code>ErrNotFound</code>, <code>ErrConflict</code>, etc. Service errors wrap them with <code>fmt.Errorf("...%w", domain.ErrNotFound)</code>. Handlers use <code>errors.Is</code> to map to HTTP status. This means error messages can be human-readable while still being machine-checkable — no stringly-typed error codes, no HTTP-awareness in the service layer.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">No global state</div>
+    <p>The Stripe SDK sets a global key (<code>stripelib.Key = secretKey</code>) in <code>pkg/stripe.New</code>. This is the only global mutation in the codebase and is a concession to the Stripe SDK's design. Everything else — DB pool, Redis client, all services — is passed explicitly via constructor injection.</p>
+  </div>
+
+  <h3>Service Layer</h3>
+
+  <div class="decision">
+    <div class="label">Services own transactions, not repos</div>
+    <p><code>ContributionService.Complete</code> begins a <code>pgxpool.Pool.Begin</code> transaction, then creates a <code>dbgen.Queries</code> scoped to that transaction (<code>dbgen.New(tx)</code>). This pattern lets services compose atomic operations across multiple repo calls without leaking transaction knowledge into the repository interface. The repo interface has no <code>WithTx</code> method.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Verify → Queued in one admin call</div>
+    <p><code>RequestService.Verify</code> does three things in sequence: update status to <code>verified</code>, enqueue, update status to <code>queued</code>. These are deliberately <em>not</em> wrapped in a transaction. If the enqueue fails, the request sits at <code>verified</code> and can be re-processed. A rollback would lose the admin's verification decision. Partial failure here is recoverable; a rollback would create more confusion.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">MarkFunded does not debit the pool</div>
+    <p>When the worker marks a request funded, the pool balance is <em>not</em> debited. The debit happens later in <code>FulfillmentService.UpdateDetails</code> when the admin records the <em>actual</em> cost (which may differ from the estimated cost). This means between "funded" and "actual cost set", the balance appears inflated. For MVP with a small admin team this is acceptable — the admin acts quickly. A future hardening step would reserve the estimated cost at funding time.</p>
+  </div>
+
+  <h3>HTTP Layer</h3>
+
+  <div class="decision">
+    <div class="label">Versioned API under /api/v1/</div>
+    <p>All routes are under <code>/api/v1/</code> except the health check and Stripe webhook. The webhook is at the root because Stripe's dashboard expects a clean URL and you can't add a path prefix to webhook deliveries after the fact. The health check is at <code>/healthz</code> for standard k8s/load-balancer compatibility.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">DecodeAndValidate disallows unknown fields</div>
+    <p><code>json.NewDecoder(r.Body).DisallowUnknownFields()</code> is set. This prevents clients from sending fields that silently do nothing — a common source of confusion when a client typos a field name. It also provides a forcing function: the API contract is explicit about what fields are accepted.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Ownership checked in handlers, not services</div>
+    <p>Handlers call <code>canAccess(ctx, req.UserID)</code> before allowing reads or mutations on owned resources. Services don't do ownership checks — they trust the handler. This keeps services reusable (e.g., the worker calling <code>MarkFunded</code> doesn't need to impersonate an admin) and keeps authorization logic in one obvious place.</p>
+  </div>
+
+  <h3>Database</h3>
+
+  <div class="decision">
+    <div class="label">pgcrypto for UUID generation</div>
+    <p>Migration 1 runs <code>CREATE EXTENSION IF NOT EXISTS "pgcrypto"</code> so that <code>gen_random_uuid()</code> is available. UUIDs are generated at the database level, not in Go. This means even direct SQL inserts (e.g., seed scripts) get proper UUIDs without any application-layer involvement.</p>
+  </div>
+
+  <div class="decision">
+    <div class="label">Postgres ENUMs for status fields</div>
+    <p>Request status, fulfillment status, urgency level, contribution status, delivery status, and institution type are all Postgres ENUM types. This enforces validity at the DB level — a bug can't write <code>"PENDING"</code> (wrong case) or <code>"in-transit"</code> (wrong separator). sqlc generates matching Go types for each.</p>
+  </div>
+
+  <!-- ── REMAINING ── -->
+  <h2 id="remaining">What Remains</h2>
+
+  <table>
+    <tr><th>Area</th><th>Status</th><th>Notes</th></tr>
+    <tr>
+      <td>Docker / Compose</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td>Dockerfile for API + worker binaries, docker-compose with Postgres and Redis. <code>docker/</code> directory is empty.</td>
+    </tr>
+    <tr>
+      <td>Seed script</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td>The global Pool row (ID <code>00000000-0000-0000-0000-000000000001</code>) must be inserted before anything runs. Currently must be done manually.</td>
+    </tr>
+    <tr>
+      <td>Migration runner</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td>No script to run migrations. Needs a Makefile target or shell script using <code>goose</code> or <code>migrate</code>.</td>
+    </tr>
+    <tr>
+      <td>Frontend</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td>Directory scaffold exists (<code>web/src/app/</code>) with the right page structure but zero files. Needs a full Next.js app with Stripe.js payment flow.</td>
+    </tr>
+    <tr>
+      <td>Tests</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td>No test files anywhere. Priority: service-layer unit tests for the request lifecycle and contribution flow. Integration tests for the funding worker.</td>
+    </tr>
+    <tr>
+      <td>API docs</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td><code>docs/api/</code> is empty. An OpenAPI 3 spec generated from the handler structs would be the natural next step.</td>
+    </tr>
+    <tr>
+      <td>Email / notifications</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td>The impact_reminder worker logs pending reminders but doesn't send emails. A future task would call an email provider (Resend, Postmark) when a reminder is due.</td>
+    </tr>
+    <tr>
+      <td>Rate limiting</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td><code>internal/repository/redis/rate_limiter.go</code> exists but is not wired into any middleware yet.</td>
+    </tr>
+    <tr>
+      <td>Request → completed status</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td>The <code>completed</code> status exists in the schema but there is no endpoint or worker task to transition a request from <code>delivered</code> to <code>completed</code>. Needs a post-impact-period confirmation step.</td>
+    </tr>
+    <tr>
+      <td>Institutional contributions via Stripe</td>
+      <td><span class="badge todo">TODO</span></td>
+      <td>Currently institutional contributions are recorded as immediately completed (no payment flow). Larger institutional pledges will need invoicing or a separate Stripe flow.</td>
+    </tr>
+  </table>
+
+  <div class="callout info">
+    <span>ℹ️</span>
+    <span>The entire backend compiles cleanly (<code>go build ./...</code> and <code>go vet ./...</code> both pass) with zero warnings. All 9 services, 10 repositories, 9 handlers, 3 worker tasks, and the Stripe integration are wired end-to-end in both binaries.</span>
+  </div>
+
+</main>
+</body>
+</html>

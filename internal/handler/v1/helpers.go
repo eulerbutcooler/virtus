@@ -17,3 +17,7 @@ func parseID(r *http.Request) (uuid.UUID, error) {
 func canAccess(ctx context.Context, ownerID uuid.UUID) bool {
 	return middleware.UserIDFrom(ctx) == ownerID || middleware.UserRoleFrom(ctx) == domain.RoleAdmin
 }
+
+func parseFulfillmentStatus(s string) domain.FulfillmentStatus {
+	return domain.FulfillmentStatus(s)
+}
