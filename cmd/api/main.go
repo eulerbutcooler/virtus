@@ -86,6 +86,7 @@ func run() error {
 
 	// Services
 	authSvc := service.NewAuthService(userRepo, cache, cfg.JWT)
+	userSvc:=service.NewUserService(userRepo)
 	poolSvc := service.NewPoolService(poolRepo)
 	queueSvc := service.NewQueueService(queueRepo)
 	requestSvc := service.NewRequestService(requestRepo, queueSvc)
@@ -100,6 +101,7 @@ func run() error {
 		Addr: fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port),
 		Handler: handler.NewRouter(handler.Services{
 			Auth:         authSvc,
+			User: userSvc,
 			Pool:         poolSvc,
 			Request:      requestSvc,
 			Queue:        queueSvc,

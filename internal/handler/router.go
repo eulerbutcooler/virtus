@@ -16,6 +16,7 @@ import (
 // Services bundles everything the HTTP layer depends on.
 type Services struct {
 	Auth         *service.AuthService
+	User *service.UserService
 	Pool         *service.PoolService
 	Request      *service.RequestService
 	Queue        *service.QueueService
@@ -29,7 +30,7 @@ type Services struct {
 
 func NewRouter(svc Services) http.Handler {
 	authn := middleware.NewAuthenticator(svc.Auth)
-
+	userH :=v1.NewUserHandler(svc.User)
 	authH := v1.NewAuthHandler(svc.Auth)
 	poolH := v1.NewPoolHandler(svc.Pool)
 	queueH := v1.NewQueueHandler(svc.Queue)
@@ -65,12 +66,9 @@ func NewRouter(svc Services) http.Handler {
 		r.Group(func(r chi.Router) {
 			r.Use(authn.RequireAuth)
 
-			r.Get("/me", func(w http.ResponseWriter, r *http.Request) {
-				response.OK(w, http.StatusOK, map[string]any{
-					"user_id": middleware.UserIDFrom(r.Context()),
-					"role":    middleware.UserRoleFrom(r.Context()),
-				})
-			})
+			r.Get("/me", userH.GetMe)
+			r.Patch("/me", userH.UpdateMe)
+			r.Post("/me/password", userH.ChangePassword)
 
 			// Pool
 			r.Get("/pool", poolH.Status)
@@ -125,6 +123,12 @@ func NewRouter(svc Services) http.Handler {
 			// Admin-only routes.
 			r.Group(func(r chi.Router) {
 				r.Use(authn.RequireRole(domain.RoleAdmin))
+
+				//Admin users
+				r.Get("/admin/users", userH.ListUsers)
+r.Get("/admin/users/{id}", userH.GetUser)
+r.Post("/admin/users/{id}/verify", userH.VerifyUser)
+r.Delete("/admin/users/{id}", userH.DeleteUser)
 
 				// Requests admin
 				r.Get("/admin/requests", requestH.AdminList)
