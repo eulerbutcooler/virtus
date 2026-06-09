@@ -30,8 +30,8 @@ Open `.env` and fill in the required fields:
 
 | Variable | Required | Notes |
 |---|---|---|
-| `DB_PASSWORD` | ✅ | Password for postgres |
-| `JWT_SECRET` | ✅ | Any long random string |
+| `DB_PASSWORD` | Password for postgres |
+| `JWT_SECRET` | Any long random string |
 | `STRIPE_SECRET_KEY` | Only for payments | From your Stripe dashboard |
 | `STRIPE_WEBHOOK_SECRET` | Only for payments | From `stripe listen` output |
 
@@ -114,3 +114,4 @@ If you edit any file in `internal/repository/postgres/queries/`, regenerate the 
 ```bash
 sqlc generate
 ```
+  
