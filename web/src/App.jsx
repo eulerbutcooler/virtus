@@ -15,6 +15,7 @@ import UsersPage from './app/admin/users/UsersPage.jsx'
 import AdminRequestsPage from './app/admin/requests/AdminRequestsPage.jsx'
 import FulfillmentsPage from './app/admin/fulfillments/FulfillmentsPage.jsx'
 import TransparencyPage from './app/transparency/TransparencyPage.jsx'
+import InstitutionDashPage from './app/institutions/dashboard/InstitutionDashPage.jsx'
 
 function ProtectedRoute({ children, requiredRole }) {
   const { isAuthenticated, loading, user } = useAuth();
@@ -72,10 +73,10 @@ function App() {
             </Route>
           </Route>
 
-          {/* Institution dashboard placeholder */}
+          {/* Institution dashboard */}
           <Route path="/institutions/dashboard" element={<AppShell />}>
             <Route element={<ProtectedRoute requiredRole="institution" />}>
-              <Route index element={<div style={{ padding: 'var(--space-8)' }}><h1>Institution Dashboard</h1><p>Placeholder for institution dashboard.</p></div>} />
+              <Route index element={<InstitutionDashPage />} />
             </Route>
           </Route>
 
