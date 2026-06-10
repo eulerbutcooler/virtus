@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '../lib/api';
 
 export function useContributions(limit = null) {
@@ -7,24 +7,36 @@ export function useContributions(limit = null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const [totalData, listData] = await Promise.all([
-          api.get('/contributions/total'),
-          api.get(`/contributions${limit ? `?limit=${limit}` : ''}`)
-        ]);
-        setTotal(totalData);
-        setContributions(listData.items || []);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
+  const fetchContributions = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [totalData, listData] = await Promise.all([
+        api.get('/contributions/total'),
+        api.get(`/contributions${limit ? `?limit=${limit}` : ''}`)
+      ]);
+      setTotal(totalData);
+      setContributions(listData.items || []);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
     }
-    fetchData();
   }, [limit]);
 
-  return { contributions, total, loading, error };
+  useEffect(() => {
+    fetchContributions();
+  }, [fetchContributions]);
+
+  const createContribution = async (amount, currency = 'USD') => {
+    const data = await api.post('/contributions', { amount, currency });
+    await fetchContributions();
+    return data; // contains client_secret
+  };
+
+  const optimisticUpdate = (tempContribution) => {
+    setContributions(prev => [tempContribution, ...prev]);
+    setTotal(prev => ({ amount: prev.amount + tempContribution.amount, count: prev.count + 1 }));
+  };
+
+  return { contributions, total, loading, error, createContribution, refresh: fetchContributions, optimisticUpdate };
 }
