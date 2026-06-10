@@ -8,9 +8,6 @@ export function useQueue(requestId) {
 
   useEffect(() => {
     async function fetchQueue() {
-      // If we don't have a requestId, we might just fetch the user's active request from somewhere else first
-      // But for now, if requestId is undefined, we could skip or fetch a generic /queue/me
-      // The API design says /queue/{requestID}. Let's assume we fetch the user's active request first if needed.
       if (!requestId) {
         setLoading(false);
         return;
@@ -29,4 +26,27 @@ export function useQueue(requestId) {
   }, [requestId]);
 
   return { queueEntry, loading, error };
+}
+
+export function useFullQueue(limit = 20, offset = 0) {
+  const [queue, setQueue] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchFullQueue() {
+      try {
+        setLoading(true);
+        const data = await api.get(`/queue?limit=${limit}&offset=${offset}`);
+        setQueue(data.items || []);
+      } catch (err) {
+        setError(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchFullQueue();
+  }, [limit, offset]);
+
+  return { queue, loading, error };
 }
