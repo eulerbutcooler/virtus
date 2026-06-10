@@ -5,8 +5,8 @@
   font-display: swap;
 }
 
-:root {
-  /* Colors */
+:root, :root[data-theme='dark'] {
+  /* Colors - Dark Mode (Default) */
   --bg-primary: #1C1C1C;
   --bg-elevated: #242424;
   --bg-surface: #2A2A2A;
@@ -16,6 +16,36 @@
   --text-disabled: #666666;
   --border-default: #2E2E2E;
   --border-focus: #D4C5A9;
+}
+
+:root[data-theme='light'] {
+  /* Colors - Light Mode */
+  --bg-primary: #FAF7F2;
+  --bg-elevated: #FFFFFF;
+  --bg-surface: #F0EAE0;
+  --bg-hover: #E8E0D1;
+  --text-primary: #1C1C1C;
+  --text-secondary: #666666;
+  --text-disabled: #A1A1A1;
+  --border-default: #E3D7C4;
+  --border-focus: #A89670;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --bg-primary: #FAF7F2;
+    --bg-elevated: #FFFFFF;
+    --bg-surface: #F0EAE0;
+    --bg-hover: #E8E0D1;
+    --text-primary: #1C1C1C;
+    --text-secondary: #666666;
+    --text-disabled: #A1A1A1;
+    --border-default: #E3D7C4;
+    --border-focus: #A89670;
+  }
+}
+
+:root {
   --beige-50: #FAF7F2;
   --beige-100: #F0E9DD;
   --beige-200: #E3D7C4;
