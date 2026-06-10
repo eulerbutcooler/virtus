@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { api } from '../lib/api';
 
 export function useRequests(limit = null) {
@@ -6,20 +6,38 @@ export function useRequests(limit = null) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const data = await api.get(`/requests${limit ? `?limit=${limit}` : ''}`);
-        setRequests(data.items || []);
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
+  const fetchRequests = useCallback(async () => {
+    try {
+      setLoading(true);
+      const data = await api.get(`/requests${limit ? `?limit=${limit}` : ''}`);
+      setRequests(data.items || []);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
     }
-    fetchData();
   }, [limit]);
 
-  return { requests, loading, error };
+  useEffect(() => {
+    fetchRequests();
+  }, [fetchRequests]);
+
+  const createRequest = async (payload) => {
+    const data = await api.post('/requests', payload);
+    await fetchRequests();
+    return data;
+  };
+
+  const updateRequest = async (id, payload) => {
+    const data = await api.patch(`/requests/${id}`, payload);
+    await fetchRequests();
+    return data;
+  };
+
+  const deleteRequest = async (id) => {
+    await api.delete(`/requests/${id}`);
+    await fetchRequests();
+  };
+
+  return { requests, loading, error, createRequest, updateRequest, deleteRequest, refresh: fetchRequests };
 }
