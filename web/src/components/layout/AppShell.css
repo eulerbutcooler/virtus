@@ -1,0 +1,39 @@
+.appshell {
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.appshell__content {
+  margin-left: 240px;
+  margin-top: 56px;
+  min-height: calc(100vh - 56px);
+  transition: margin-left var(--transition-slow);
+}
+
+.appshell__content--collapsed {
+  margin-left: 64px;
+}
+
+.appshell__content--mobile {
+  margin-left: 0;
+}
+
+.appshell__main {
+  padding: var(--space-6);
+  max-width: 1200px;
+}
+
+@media (max-width: 768px) {
+  .appshell__content {
+    margin-left: 0;
+  }
+  .appshell__main {
+    padding: var(--space-4);
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1023px) {
+  .appshell__content {
+    margin-left: 64px;
+  }
+}

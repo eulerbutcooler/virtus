@@ -1,0 +1,43 @@
+.progressbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.progressbar__label {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.progressbar__track {
+  width: 100%;
+  height: 6px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.progressbar__fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  background: var(--beige-300);
+  transition: width 600ms ease-out;
+  min-width: 0;
+}
+
+.progressbar__fill--success {
+  background: var(--success);
+}
+
+.progressbar__fill--warning {
+  background: var(--warning);
+}
+
+.progressbar__fill--error {
+  background: var(--error);
+}
+
+.progressbar__fill--info {
+  background: var(--info);
+}
