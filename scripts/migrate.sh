@@ -1,14 +1,29 @@
-#!/bin/bash
-
+#!/bin/sh
 set -e
-echo "Running db migrations..."
 
-docker run --rm \
--v $(pwd) /migrations:/migrations \
---network virtus_default
-migrate/migrate \
--path=/migrations/ \
--database "postgres://virtus:virtus@postgres:5432/virtus?sslmode=disable" \
-up
+# Load DB credentials from .env if present
+if [ -f .env ]; then
+  export $(grep -v '^#' .env | grep -E '^DB_' | xargs)
+fi
 
-echo "Migrations completed successfully"
+DB_USER="${DB_USER:-virtus}"
+DB_PASSWORD="${DB_PASSWORD:-virtus}"
+DB_NAME="${DB_NAME:-virtusdb}"
+DB_PORT="${DB_PORT:-5432}"
+DB_URL="postgres://${DB_USER}:${DB_PASSWORD}@localhost:${DB_PORT}/${DB_NAME}?sslmode=disable"
+
+echo "Running database migrations..."
+
+if command -v migrate > /dev/null 2>&1; then
+  migrate -path ./migrations -database "${DB_URL}" up
+else
+  echo "  'migrate' CLI not found, falling back to Docker..."
+  docker run --rm \
+    -v "$(pwd)/migrations:/migrations" \
+    --network host \
+    migrate/migrate \
+    -path=/migrations/ \
+    -database "${DB_URL}" up
+fi
+
+echo "Migrations completed successfully!"

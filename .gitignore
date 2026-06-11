@@ -29,7 +29,8 @@ web/dist/
 web/.cache/
 web/.vite/
 web/*.local
-
+web/.agents/
+frontend.md
 # Environment
 .env
 .env.local

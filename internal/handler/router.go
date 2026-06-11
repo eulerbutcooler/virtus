@@ -11,6 +11,7 @@ import (
 	stripepkg "github.com/eulerbutcooler/virtus/pkg/stripe"
 	"github.com/go-chi/chi/v5"
 	chimw "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 )
 
 // Services bundles everything the HTTP layer depends on.
@@ -42,6 +43,22 @@ func NewRouter(svc Services) http.Handler {
 	institutionH := v1.NewInstitutionHandler(svc.Institution)
 
 	r := chi.NewRouter()
+
+	// CORS — must be the first middleware so preflight OPTIONS requests are handled
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{
+			"http://localhost:3000",
+			"http://localhost:3001",
+			"http://127.0.0.1:3000",
+			"http://127.0.0.1:3001",
+		},
+		AllowedMethods:   []string{"GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Request-Id"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
+
 	r.Use(chimw.RequestID)
 	r.Use(middleware.RequestLogger)
 	r.Use(chimw.Recoverer)

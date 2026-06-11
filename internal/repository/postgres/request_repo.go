@@ -9,7 +9,6 @@ import (
 	dbgen "github.com/eulerbutcooler/virtus/internal/repository/postgres/db"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type requestRepo struct {
@@ -57,20 +56,13 @@ func (r *requestRepo) Update(ctx context.Context, id uuid.UUID, p domain.UpdateR
 		}
 	}
 
-	var estimated pgtype.Numeric
-	if p.EstimatedCost != nil {
-		if err := estimated.Scan(*p.EstimatedCost); err != nil {
-			return nil, fmt.Errorf("requestRepo.Update estimatedCost scan: %w", err)
-		}
-	}
-
 	row, err := r.q.UpdateRequest(ctx, dbgen.UpdateRequestParams{
 		ID:            id,
 		ItemCategory:  p.ItemCategory,
 		ItemName:      p.ItemName,
 		Description:   p.Description,
 		Urgency:       urgency,
-		EstimatedCost: estimated,
+		EstimatedCost: p.EstimatedCost, // now *float64, matches DB float8
 		Justification: p.Justification,
 	})
 	if err != nil {

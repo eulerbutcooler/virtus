@@ -30,7 +30,7 @@ services:
   api:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     command: ["/app/api"]
     environment:
       - APP_ENV=development
@@ -55,7 +55,7 @@ services:
   worker:
     build:
       context: .
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
     command: ["/app/worker"]
     environment:
       - APP_ENV=development

@@ -9,7 +9,6 @@ import (
 	"context"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countAllRequests = `-- name: CountAllRequests :one
@@ -282,7 +281,7 @@ type UpdateRequestParams struct {
 	ItemName      *string          `json:"item_name"`
 	Description   *string          `json:"description"`
 	Urgency       NullUrgencyLevel `json:"urgency"`
-	EstimatedCost pgtype.Numeric   `json:"estimated_cost"`
+	EstimatedCost *float64         `json:"estimated_cost"`
 	Justification *string          `json:"justification"`
 	ID            uuid.UUID        `json:"id"`
 }
