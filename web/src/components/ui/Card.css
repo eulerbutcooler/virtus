@@ -1,16 +1,19 @@
 .card {
   background: var(--bg-elevated);
+  background-image: var(--gradient-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   padding: var(--space-5);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition-base);
+  transition: box-shadow var(--transition-base), border-color var(--transition-base);
+  position: relative;
+  overflow: hidden;
 }
 
 .card--interactive {
   cursor: pointer;
 }
-
 .card--interactive:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-md), 0 0 0 1px var(--border-default);
+  border-color: rgba(92, 171, 110, 0.2);
 }

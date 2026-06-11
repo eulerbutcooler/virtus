@@ -29,8 +29,7 @@ export default function ContributionForm({ amount, clientSecret, onSuccess, onCa
       elements,
       clientSecret,
       confirmParams: {
-        // Assume we redirect or handle without redirecting depending on flow
-        // In Virtus, it's nice to stay on the same page. Stripe will handle it.
+
         return_url: window.location.origin + '/dashboard/contributions?success=true',
       },
       redirect: 'if_required', // Avoid full page redirect if possible
@@ -40,7 +39,7 @@ export default function ContributionForm({ amount, clientSecret, onSuccess, onCa
       setError(confirmError.message);
       setIsProcessing(false);
     } else {
-      // Payment succeeded directly
+
       onSuccess();
     }
   };
@@ -48,9 +47,9 @@ export default function ContributionForm({ amount, clientSecret, onSuccess, onCa
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
       <PaymentElement />
-      
+
       {error && <div style={{ color: 'var(--error)', fontSize: 'var(--font-sm)' }}>{error}</div>}
-      
+
       <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
         <Button type="submit" variant="primary" disabled={!stripe || isProcessing}>
           {isProcessing ? 'Processing...' : `Contribute $${amount}`}

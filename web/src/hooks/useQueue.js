@@ -38,7 +38,7 @@ export function useFullQueue(limit = 20, offset = 0) {
       try {
         setLoading(true);
         const data = await api.get(`/queue?limit=${limit}&offset=${offset}`);
-        setQueue(data.items || []);
+        setQueue(Array.isArray(data) ? data : (data.items || []));
       } catch (err) {
         setError(err);
       } finally {

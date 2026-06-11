@@ -10,7 +10,7 @@ export function useAdminFulfillments(limit = 50, offset = 0) {
     try {
       setLoading(true);
       const data = await api.get(`/admin/fulfillments?limit=${limit}&offset=${offset}`);
-      setFulfillments(data.items || []);
+      setFulfillments(Array.isArray(data) ? data : (data.items || []));
     } catch (err) {
       setError(err);
     } finally {
@@ -23,7 +23,7 @@ export function useAdminFulfillments(limit = 50, offset = 0) {
   }, [fetchFulfillments]);
 
   const beginFulfillment = async (requestId, payload) => {
-    // payload: { vendor_name, vendor_ref, actual_cost, notes }
+
     await api.post(`/admin/fulfillments`, { request_id: requestId, ...payload });
     await fetchFulfillments();
   };
@@ -53,10 +53,10 @@ export function useAdminFulfillments(limit = 50, offset = 0) {
     await fetchFulfillments();
   };
 
-  return { 
-    fulfillments, loading, error, 
+  return {
+    fulfillments, loading, error,
     beginFulfillment, updateFulfillment, cancelFulfillment,
     shipDelivery, verifyDelivery, failDelivery,
-    refresh: fetchFulfillments 
+    refresh: fetchFulfillments
   };
 }

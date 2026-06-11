@@ -44,9 +44,9 @@ export default function UsersPage() {
     { key: 'role', label: 'Role', render: u => <Badge variant={u.role === 'admin' ? 'info' : 'neutral'}>{u.role}</Badge> },
     { key: 'verified', label: 'Verified', render: u => <Badge variant={u.verified ? 'success' : 'warning'}>{u.verified ? 'Yes' : 'No'}</Badge> },
     { key: 'joined_at', label: 'Joined', render: u => formatDate(u.joined_at) },
-    { 
-      key: 'actions', 
-      label: 'Actions', 
+    {
+      key: 'actions',
+      label: 'Actions',
       render: u => (
         <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           {!u.verified && <Button size="sm" variant="ghost" onClick={() => handleVerify(u)} disabled={actionLoading}>Verify</Button>}
@@ -56,14 +56,14 @@ export default function UsersPage() {
             </Button>
           )}
         </div>
-      ) 
+      )
     }
   ];
 
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '1200px', margin: '0 auto' }}>
       <PageHeader title="Users" subtitle="Manage members and institutions in Virtus" />
-      
+
       {loading ? (
         <div style={{ height: '300px', animation: 'shimmer 1.5s infinite', background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)' }}></div>
       ) : (

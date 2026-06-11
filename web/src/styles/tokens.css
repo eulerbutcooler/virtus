@@ -1,105 +1,107 @@
-@font-face {
-  font-family: 'General Sans';
-  src: url('/fonts/GeneralSans-Variable.woff2') format('woff2');
-  font-weight: 400 700;
-  font-display: swap;
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-:root, :root[data-theme='dark'] {
-  /* Colors - Dark Mode (Default) */
-  --bg-primary: #1C1C1C;
-  --bg-elevated: #242424;
-  --bg-surface: #2A2A2A;
-  --bg-hover: #333333;
-  --text-primary: #E5E5E5;
-  --text-secondary: #A1A1A1;
-  --text-disabled: #666666;
-  --border-default: #2E2E2E;
-  --border-focus: #D4C5A9;
-}
-
+:root,
 :root[data-theme='light'] {
-  /* Colors - Light Mode */
-  --bg-primary: #FAF7F2;
-  --bg-elevated: #FFFFFF;
-  --bg-surface: #F0EAE0;
-  --bg-hover: #E8E0D1;
-  --text-primary: #1C1C1C;
-  --text-secondary: #666666;
-  --text-disabled: #A1A1A1;
-  --border-default: #E3D7C4;
-  --border-focus: #A89670;
+  --bg-primary:   #F4F9F5;
+  --bg-elevated:  #FFFFFF;
+  --bg-surface:   #E8F3EB;
+  --bg-hover:     #D6EBD9;
+  --text-primary:    #0A1A0D;
+  --text-secondary:  #3A6644;
+  --text-disabled:   #88B094;
+  --border-default:  #C8DFC9;
+  --border-focus:    #4A9660;
 }
 
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) {
-    --bg-primary: #FAF7F2;
-    --bg-elevated: #FFFFFF;
-    --bg-surface: #F0EAE0;
-    --bg-hover: #E8E0D1;
-    --text-primary: #1C1C1C;
-    --text-secondary: #666666;
-    --text-disabled: #A1A1A1;
-    --border-default: #E3D7C4;
-    --border-focus: #A89670;
-  }
+:root[data-theme='dark'] {
+  --bg-primary:   #0A1A0D;
+  --bg-elevated:  #111F14;
+  --bg-surface:   #182B1C;
+  --bg-hover:     #1F3824;
+  --text-primary:    #DFF0E2;
+  --text-secondary:  #88B094;
+  --text-disabled:   #3E5E45;
+  --border-default:  #1E3325;
+  --border-focus:    #5CAB6E;
 }
 
 :root {
-  --beige-50: #FAF7F2;
-  --beige-100: #F0E9DD;
-  --beige-200: #E3D7C4;
-  --beige-300: #D4C5A9;
-  --beige-400: #C4B08A;
-  --beige-500: #A89670;
-  --success: #7EBF8E;
-  --warning: #D4A843;
-  --error: #C75D5D;
-  --info: #6BA3BE;
 
-  /* Typography */
-  --font-family: 'General Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --letter-spacing: -0.15px;
-  --font-xs: 0.75rem;
-  --font-sm: 0.8125rem;
+  --leaf-50:  #F0FAF2;
+  --leaf-100: #D6F0DC;
+  --leaf-200: #AADDBA;
+  --leaf-300: #5CAB6E;
+  --leaf-400: #4A9660;
+  --leaf-500: #3A7D4E;
+
+
+  --solar-300: #F2C94C;
+  --solar-400: #E0B535;
+  --solar-500: #C99E20;
+
+
+  --success: #5CAB6E;
+  --warning: #F2C94C;
+  --error:   #E05C5C;
+  --info:    #5B9BBF;
+
+
+  --letter-spacing:      -0.1px;
+  --letter-spacing-wide:  0.04em;
+  --font-xs:   0.75rem;
+  --font-sm:   0.8125rem;
   --font-base: 0.875rem;
-  --font-md: 1rem;
-  --font-lg: 1.25rem;
-  --font-xl: 1.5rem;
-  --font-2xl: 2rem;
-  --font-weight-regular: 400;
-  --font-weight-medium: 500;
+  --font-md:   1rem;
+  --font-lg:   1.25rem;
+  --font-xl:   1.5rem;
+  --font-2xl:  2rem;
+  --font-3xl:  2.5rem;
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
   --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --line-height-tight: 1.2;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.65;
+  --font-weight-bold:     700;
+  --line-height-tight:    1.2;
+  --line-height-normal:   1.5;
+  --line-height-relaxed:  1.65;
 
-  /* Spacing */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 20px;
-  --space-6: 24px;
-  --space-8: 32px;
+
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
 
-  /* Radii */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 16px rgba(212, 197, 169, 0.08);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 
-  /* Transitions */
+
+  --shadow-sm:   0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md:   0 4px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg:   0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 24px rgba(92, 171, 110, 0.12);
+  --shadow-gold: 0 0 20px rgba(242, 201, 76, 0.10);
+
+
   --transition-fast: 120ms ease;
   --transition-base: 200ms ease;
   --transition-slow: 350ms ease;
+
+
+  --gradient-canopy: linear-gradient(135deg, #0A1A0D 0%, #111F14 100%);
+  --gradient-leaf:   linear-gradient(135deg, #5CAB6E 0%, #4A9660 100%);
+  --gradient-solar:  linear-gradient(135deg, #F2C94C 0%, #E0B535 100%);
+  --gradient-card:   radial-gradient(ellipse at top left, rgba(92,171,110,0.05) 0%, transparent 60%);
 }

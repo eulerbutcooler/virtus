@@ -5,7 +5,7 @@ import Button from '../ui/Button';
 
 const CATEGORIES = ['housing', 'medical', 'transportation', 'education', 'food', 'utilities', 'other'];
 
-export default function RequestForm({ initialData = null, onSubmit, isLoading = false }) {
+export default function RequestForm({ initialData = null, onSubmit, onCancel, isLoading = false }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     item_name: '',
@@ -51,15 +51,15 @@ export default function RequestForm({ initialData = null, onSubmit, isLoading = 
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Category</label>
-        <select 
-          name="item_category" 
-          value={formData.item_category} 
+        <select
+          name="item_category"
+          value={formData.item_category}
           onChange={handleChange}
-          style={{ 
-            height: '36px', 
-            background: 'var(--bg-surface)', 
-            border: '1px solid var(--border-default)', 
-            borderRadius: 'var(--radius-sm)', 
+          style={{
+            height: '36px',
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--radius-sm)',
             color: 'var(--text-primary)',
             padding: '0 var(--space-2)'
           }}
@@ -76,12 +76,12 @@ export default function RequestForm({ initialData = null, onSubmit, isLoading = 
         <div style={{ display: 'flex', gap: 'var(--space-4)' }}>
           {['low', 'standard', 'high', 'critical'].map(level => (
             <label key={level} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', fontSize: 'var(--font-sm)', color: 'var(--text-primary)' }}>
-              <input 
-                type="radio" 
-                name="urgency" 
-                value={level} 
-                checked={formData.urgency === level} 
-                onChange={handleChange} 
+              <input
+                type="radio"
+                name="urgency"
+                value={level}
+                checked={formData.urgency === level}
+                onChange={handleChange}
               />
               {level.charAt(0).toUpperCase() + level.slice(1)}
             </label>
@@ -89,15 +89,18 @@ export default function RequestForm({ initialData = null, onSubmit, isLoading = 
         </div>
       </div>
 
-      <Input
-        name="estimated_cost"
-        type="number"
-        placeholder="Estimated Cost ($)"
-        value={formData.estimated_cost}
-        onChange={handleChange}
-        min="1"
-        required
-      />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+        <label style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Estimated Cost ($)</label>
+        <Input
+          name="estimated_cost"
+          type="number"
+          placeholder="e.g. 120.00"
+          value={formData.estimated_cost}
+          onChange={handleChange}
+          min="1"
+          required
+        />
+      </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Description</label>
@@ -143,7 +146,7 @@ export default function RequestForm({ initialData = null, onSubmit, isLoading = 
         <Button type="submit" variant="primary" disabled={isLoading}>
           {isLoading ? 'Saving...' : initialData ? 'Save Changes' : 'Submit Request'}
         </Button>
-        <Button type="button" variant="ghost" onClick={() => navigate('/dashboard/requests')} disabled={isLoading}>
+        <Button type="button" variant="ghost" onClick={() => onCancel ? onCancel() : navigate('/dashboard/requests')} disabled={isLoading}>
           Cancel
         </Button>
       </div>

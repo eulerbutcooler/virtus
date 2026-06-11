@@ -31,36 +31,36 @@ export default function RegisterPage() {
     <>
       <h2 className="auth-form-title">Create Account</h2>
       <p className="auth-form-subtitle">Join the Virtus community</p>
-      
+
       {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--space-4)', fontSize: 'var(--font-sm)' }}>{error}</div>}
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        <Input 
-          type="text" 
-          placeholder="Full name" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-          required 
+        <Input
+          type="text"
+          placeholder="Full name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
         />
-        <Input 
-          type="email" 
-          placeholder="Email address" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          required 
+        <Input
+          type="email"
+          placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
-        <Input 
-          type="password" 
-          placeholder="Password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          required 
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <Button type="submit" variant="primary" disabled={loading} style={{ marginTop: 'var(--space-2)' }}>
           {loading ? 'Creating account...' : 'Create Account'}
         </Button>
       </form>
-      
+
       <p style={{ marginTop: 'var(--space-6)', fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>
         Already a member? <Link to="/login">Sign in</Link>
       </p>

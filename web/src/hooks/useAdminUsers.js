@@ -10,7 +10,7 @@ export function useAdminUsers(limit = 50, offset = 0) {
     try {
       setLoading(true);
       const data = await api.get(`/admin/users?limit=${limit}&offset=${offset}`);
-      setUsers(data.items || []);
+      setUsers(Array.isArray(data) ? data : (data.items || []));
     } catch (err) {
       setError(err);
     } finally {

@@ -28,31 +28,31 @@ export default function LoginPage() {
 
   return (
     <>
-      <h2 className="auth-form-title">Sign In</h2>
-      <p className="auth-form-subtitle">Welcome back to Virtus</p>
-      
+      <h2 className="auth-form-title">Welcome back</h2>
+      <p className="auth-form-subtitle">Sign in to continue growing with the community</p>
+
       {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--space-4)', fontSize: 'var(--font-sm)' }}>{error}</div>}
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        <Input 
-          type="email" 
-          placeholder="Email address" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          required 
+        <Input
+          type="email"
+          placeholder="Email address"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
         />
-        <Input 
-          type="password" 
-          placeholder="Password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          required 
+        <Input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
         />
         <Button type="submit" variant="primary" disabled={loading} style={{ marginTop: 'var(--space-2)' }}>
           {loading ? 'Signing in...' : 'Sign In'}
         </Button>
       </form>
-      
+
       <p style={{ marginTop: 'var(--space-6)', fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>
         Don't have an account? <Link to="/register">Create one</Link>
       </p>

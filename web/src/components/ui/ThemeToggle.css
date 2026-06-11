@@ -1,0 +1,105 @@
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 999px;
+  outline: none;
+  flex-shrink: 0;
+}
+
+.theme-toggle:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--border-focus);
+}
+
+.theme-toggle__track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 52px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1.5px solid var(--border-default);
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease;
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+.theme-toggle--light .theme-toggle__track {
+  background: linear-gradient(135deg, #FFF9E6 0%, #E8F3EB 100%);
+  border-color: rgba(242, 201, 76, 0.35);
+}
+
+.theme-toggle--dark .theme-toggle__track {
+  background: linear-gradient(135deg, #182B1C 0%, #111F14 100%);
+  border-color: rgba(92, 171, 110, 0.3);
+}
+
+.theme-toggle:hover .theme-toggle__track {
+  border-color: var(--border-focus);
+}
+
+.theme-toggle__icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  transition: opacity 250ms ease, transform 250ms ease;
+  pointer-events: none;
+}
+
+.theme-toggle__icon--sun {
+  left: 6px;
+  color: #E6A817;
+}
+
+.theme-toggle__icon--moon {
+  right: 6px;
+  color: var(--leaf-300);
+}
+
+.theme-toggle--light .theme-toggle__icon--sun {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+.theme-toggle--light .theme-toggle__icon--moon {
+  opacity: 0;
+  transform: scale(0.7);
+}
+
+.theme-toggle--dark .theme-toggle__icon--sun {
+  opacity: 0;
+  transform: scale(0.7) rotate(90deg);
+}
+.theme-toggle--dark .theme-toggle__icon--moon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.theme-toggle__thumb {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: left 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.theme-toggle--light .theme-toggle__thumb {
+  left: 3px;
+  background: radial-gradient(circle at 40% 35%, #FFF3C4, #F2C94C);
+}
+
+.theme-toggle--dark .theme-toggle__thumb {
+  left: calc(100% - 23px);
+  background: radial-gradient(circle at 40% 35%, #A8E6B0, #5CAB6E);
+}

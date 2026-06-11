@@ -17,8 +17,6 @@ export default function ImpactPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Derive deliveries from delivered requests for the selector
-  // Mocking delivery object structure based on request for the form
   const deliveredRequests = requests?.filter(r => r.status === 'delivered') || [];
   const mockDeliveries = deliveredRequests.map(r => ({
     id: `del-${r.id}`,
@@ -39,22 +37,22 @@ export default function ImpactPage() {
 
   const renderStars = (score) => {
     return Array.from({ length: 5 }).map((_, i) => (
-      <HugeiconsIcon 
-        key={i} 
-        icon={StarIcon} 
-        size={16} 
-        color={i < score ? 'var(--beige-300)' : 'var(--border-default)'} 
-        strokeWidth={2} 
-        style={{ fill: i < score ? 'var(--beige-300)' : 'transparent' }}
+      <HugeiconsIcon
+        key={i}
+        icon={StarIcon}
+        size={16}
+        color={i < score ? 'var(--solar-300)' : 'var(--border-default)'}
+        strokeWidth={2}
+        style={{ fill: i < score ? 'var(--solar-300)' : 'transparent' }}
       />
     ));
   };
 
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '1000px', margin: '0 auto' }}>
-      <PageHeader 
-        title="My Impact" 
-        subtitle="Share how the community pool has helped you" 
+      <PageHeader
+        title="My Impact"
+        subtitle="Share how the community pool has helped you"
         action={
           <Button variant="primary" onClick={() => setModalOpen(true)} disabled={mockDeliveries.length === 0}>
             + Record Impact
@@ -65,8 +63,8 @@ export default function ImpactPage() {
       {loading ? (
         <div style={{ height: '300px', animation: 'shimmer 1.5s infinite', background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)' }}></div>
       ) : impacts.length === 0 ? (
-        <EmptyState 
-          title="No impact records" 
+        <EmptyState
+          title="No impact records"
           description={mockDeliveries.length === 0 ? "You'll be able to record impact once your requests are delivered." : "Record your first impact update to inspire the community!"}
         />
       ) : (
@@ -98,11 +96,11 @@ export default function ImpactPage() {
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)} title="Record Impact">
-        <ImpactForm 
-          deliveries={mockDeliveries} 
-          onSubmit={handleRecord} 
-          onCancel={() => setModalOpen(false)} 
-          isLoading={actionLoading} 
+        <ImpactForm
+          deliveries={mockDeliveries}
+          onSubmit={handleRecord}
+          onCancel={() => setModalOpen(false)}
+          isLoading={actionLoading}
         />
       </Modal>
     </div>

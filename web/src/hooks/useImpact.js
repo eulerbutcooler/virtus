@@ -10,7 +10,7 @@ export function useImpact() {
     try {
       setLoading(true);
       const data = await api.get('/impact');
-      setImpacts(data.items || []);
+      setImpacts(Array.isArray(data) ? data : (data.items || []));
     } catch (err) {
       setError(err);
     } finally {
@@ -23,7 +23,7 @@ export function useImpact() {
   }, [fetchImpacts]);
 
   const createImpact = async (payload) => {
-    // payload: { delivery_id, interval, outcome, satisfaction_score, description }
+
     await api.post('/impact', payload);
     await fetchImpacts();
   };

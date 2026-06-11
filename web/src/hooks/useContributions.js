@@ -15,7 +15,7 @@ export function useContributions(limit = null) {
         api.get(`/contributions${limit ? `?limit=${limit}` : ''}`)
       ]);
       setTotal(totalData);
-      setContributions(listData.items || []);
+      setContributions(Array.isArray(listData) ? listData : (listData.items || []));
     } catch (err) {
       setError(err);
     } finally {

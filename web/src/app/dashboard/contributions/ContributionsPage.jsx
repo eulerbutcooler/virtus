@@ -12,8 +12,6 @@ import EmptyState from '../../../components/ui/EmptyState';
 import ContributionForm from '../../../components/forms/ContributionForm';
 import { formatCurrency, formatDate } from '../../../lib/formatters';
 
-// Make sure to call loadStripe outside of a component's render to avoid recreating the Stripe object on every render.
-// Using a placeholder public key for development
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY || 'pk_test_51MockStripeKey1234567890');
 
 export default function ContributionsPage() {
@@ -38,7 +36,7 @@ export default function ContributionsPage() {
       const data = await createContribution(numAmount, 'USD');
       if (data.client_secret) {
         setClientSecret(data.client_secret);
-        // Optimistically add to UI as "processing"
+
         optimisticUpdate({
           id: `temp-${Date.now()}`,
           amount: numAmount,
@@ -47,7 +45,7 @@ export default function ContributionsPage() {
           created_at: new Date().toISOString()
         });
       } else {
-        // Fallback for mock backend testing if no stripe integration
+
         setModalOpen(false);
         setAmount('');
       }
@@ -91,9 +89,9 @@ export default function ContributionsPage() {
 
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '1200px', margin: '0 auto' }}>
-      <PageHeader 
-        title="My Contributions" 
-        subtitle="Your impact on the community pool" 
+      <PageHeader
+        title="My Contributions"
+        subtitle="Your impact on the community pool"
         action={
           <Button variant="primary" onClick={() => setModalOpen(true)}>Contribute</Button>
         }
@@ -101,7 +99,7 @@ export default function ContributionsPage() {
 
       <div style={{ marginBottom: 'var(--space-8)' }}>
         <h2 style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)', textTransform: 'uppercase', marginBottom: 'var(--space-2)' }}>Total Contributed</h2>
-        <div style={{ fontSize: 'var(--font-2xl)', color: 'var(--beige-200)' }}>
+        <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--font-2xl)', color: 'var(--solar-300)', letterSpacing: '-0.03em', textShadow: '0 0 20px rgba(242,201,76,0.2)' }}>
           {formatCurrency(total?.amount || 0)}
         </div>
       </div>
@@ -109,8 +107,8 @@ export default function ContributionsPage() {
       {loading && contributions.length === 0 ? (
         <div style={{ height: '300px', animation: 'shimmer 1.5s infinite', background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)' }}></div>
       ) : contributions.length === 0 ? (
-        <EmptyState 
-          title="No contributions yet" 
+        <EmptyState
+          title="No contributions yet"
           description="Your first contribution helps fulfill a community need."
           action={<Button variant="primary" onClick={() => setModalOpen(true)}>Make a Contribution</Button>}
         />
@@ -123,13 +121,13 @@ export default function ContributionsPage() {
           <form onSubmit={handleInitiate} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
             <p style={{ color: 'var(--text-secondary)' }}>Enter the amount you would like to contribute to the community pool.</p>
             {error && <div style={{ color: 'var(--error)', fontSize: 'var(--font-sm)' }}>{error}</div>}
-            <Input 
-              type="number" 
-              placeholder="Amount ($)" 
-              value={amount} 
-              onChange={(e) => setAmount(e.target.value)} 
-              min="1" 
-              required 
+            <Input
+              type="number"
+              placeholder="Amount ($)"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              min="1"
+              required
             />
             <div style={{ display: 'flex', gap: 'var(--space-4)', marginTop: 'var(--space-4)' }}>
               <Button type="submit" variant="primary" disabled={initLoading}>
@@ -141,12 +139,12 @@ export default function ContributionsPage() {
             </div>
           </form>
         ) : (
-          <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night', variables: { colorPrimary: '#D4C5A9', colorBackground: '#2A2A2A', colorText: '#E5E5E5' } } }}>
-            <ContributionForm 
-              amount={amount} 
-              clientSecret={clientSecret} 
-              onSuccess={handleSuccess} 
-              onCancel={handleCancel} 
+          <Elements stripe={stripePromise} options={{ clientSecret, appearance: { theme: 'night', variables: { colorPrimary: '#5CAB6E', colorBackground: '#182B1C', colorText: '#DFF0E2' } } }}>
+            <ContributionForm
+              amount={amount}
+              clientSecret={clientSecret}
+              onSuccess={handleSuccess}
+              onCancel={handleCancel}
             />
           </Elements>
         )}

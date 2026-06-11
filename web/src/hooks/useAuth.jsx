@@ -25,21 +25,34 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const data = await api.post('/auth/login', { email, password });
-    localStorage.setItem('virtus_token', data.access_token);
-    const userData = await api.get('/me');
-    setUser(userData);
+    setLoading(true);
+    try {
+      const data = await api.post('/auth/login', { email, password });
+
+      localStorage.setItem('virtus_token', data.token.access_token);
+      localStorage.setItem('virtus_refresh_token', data.token.refresh_token);
+      setUser(data.user);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const register = async (name, email, password) => {
-    const data = await api.post('/auth/register', { name, email, password });
-    localStorage.setItem('virtus_token', data.access_token);
-    const userData = await api.get('/me');
-    setUser(userData);
+    setLoading(true);
+    try {
+      const data = await api.post('/auth/register', { name, email, password });
+
+      localStorage.setItem('virtus_token', data.token.access_token);
+      localStorage.setItem('virtus_refresh_token', data.token.refresh_token);
+      setUser(data.user);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const logout = useCallback(() => {
     localStorage.removeItem('virtus_token');
+    localStorage.removeItem('virtus_refresh_token');
     setUser(null);
   }, []);
 

@@ -26,11 +26,11 @@ export default function NewRequestPage() {
 
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '800px', margin: '0 auto' }}>
-      <PageHeader 
-        title="New Request" 
-        subtitle="Submit a new fulfillment request to the community" 
+      <PageHeader
+        title="New Request"
+        subtitle="Submit a new fulfillment request to the community"
       />
-      
+
       <Card>
         {error && <div style={{ color: 'var(--error)', marginBottom: 'var(--space-4)' }}>{error}</div>}
         <RequestForm onSubmit={handleSubmit} isLoading={loading} />

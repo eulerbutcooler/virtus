@@ -1,12 +1,23 @@
 import Card from '../ui/Card';
 import Badge from '../ui/Badge';
 import { formatRelativeTime } from '../../lib/formatters';
+import { Link } from 'react-router-dom';
 
 export default function RecentActivityFeed({ requests, contributions, loading }) {
   if (loading) {
     return (
       <Card>
-        <div style={{ height: '200px', animation: 'shimmer 1.5s infinite', background: 'var(--bg-surface)', borderRadius: 'var(--radius-sm)' }}></div>
+        {[1,2,3].map(i => (
+          <div key={i} style={{
+            height: '48px',
+            marginBottom: i < 3 ? 'var(--space-3)' : 0,
+            background: 'linear-gradient(90deg, var(--bg-surface) 25%, var(--bg-hover) 50%, var(--bg-surface) 75%)',
+            backgroundSize: '200% 100%',
+            animation: `shimmer 1.5s linear infinite`,
+            animationDelay: `${i * 0.1}s`,
+            borderRadius: 'var(--radius-sm)'
+          }} />
+        ))}
       </Card>
     );
   }
@@ -31,15 +42,6 @@ export default function RecentActivityFeed({ requests, contributions, loading })
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, 8);
 
-  if (activities.length === 0) {
-    return (
-      <Card>
-        <h2 style={{ fontSize: 'var(--font-md)', marginBottom: 'var(--space-4)', color: 'var(--text-primary)' }}>Recent Activity</h2>
-        <div style={{ color: 'var(--text-secondary)', padding: 'var(--space-4) 0', fontSize: 'var(--font-sm)' }}>No recent activity to show.</div>
-      </Card>
-    );
-  }
-
   const getStatusVariant = (status) => {
     switch (status) {
       case 'completed':
@@ -58,28 +60,89 @@ export default function RecentActivityFeed({ requests, contributions, loading })
     }
   };
 
+  const getDotColor = (type) => type === 'contribution' ? 'var(--solar-300)' : 'var(--leaf-300)';
+
   return (
     <Card>
-      <h2 style={{ fontSize: 'var(--font-md)', marginBottom: 'var(--space-4)', color: 'var(--text-primary)' }}>Recent Activity</h2>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {activities.map((activity, idx) => (
-          <div key={activity.id} style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            padding: 'var(--space-3) 0',
-            borderBottom: idx !== activities.length - 1 ? '1px solid var(--border-default)' : 'none'
-          }}>
-            <div>
-              <div style={{ color: 'var(--text-primary)', fontSize: 'var(--font-sm)', marginBottom: 'var(--space-1)' }}>{activity.desc}</div>
-              <div style={{ color: 'var(--text-secondary)', fontSize: 'var(--font-xs)' }}>{formatRelativeTime(activity.date)}</div>
-            </div>
-            <Badge variant={getStatusVariant(activity.status)}>
-              {activity.status}
-            </Badge>
-          </div>
-        ))}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'baseline',
+        marginBottom: 'var(--space-5)'
+      }}>
+        <h3 style={{
+          fontFamily: 'var(--font-display)',
+          fontSize: 'var(--font-lg)',
+          fontWeight: 600,
+          letterSpacing: '-0.02em',
+          color: 'var(--text-primary)'
+        }}>
+          Recent Activity
+        </h3>
+        {activities.length > 0 && (
+          <Link to="/dashboard/requests" style={{ fontSize: 'var(--font-xs)' }}>
+            View all →
+          </Link>
+        )}
       </div>
+
+      {activities.length === 0 ? (
+        <div style={{
+          color: 'var(--text-secondary)',
+          padding: 'var(--space-6) 0',
+          fontSize: 'var(--font-sm)',
+          textAlign: 'center',
+          letterSpacing: '0.01em'
+        }}>
+          No contributions yet — your first one starts the cycle
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', position: 'relative' }}>
+          {activities.map((activity, idx) => (
+            <div key={activity.id} style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-4)',
+              padding: 'var(--space-3) 0',
+              borderBottom: idx !== activities.length - 1 ? '1px solid var(--border-default)' : 'none',
+            }}>
+
+              <div style={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                background: getDotColor(activity.type),
+                flexShrink: 0,
+                boxShadow: `0 0 6px ${getDotColor(activity.type)}`
+              }} />
+
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{
+                  color: 'var(--text-primary)',
+                  fontSize: 'var(--font-sm)',
+                  marginBottom: '2px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {activity.desc}
+                </div>
+                <div style={{
+                  color: 'var(--text-disabled)',
+                  fontSize: 'var(--font-xs)',
+                  letterSpacing: '0.02em'
+                }}>
+                  {formatRelativeTime(activity.date)}
+                </div>
+              </div>
+
+              <Badge variant={getStatusVariant(activity.status)}>
+                {activity.status}
+              </Badge>
+            </div>
+          ))}
+        </div>
+      )}
     </Card>
   );
 }

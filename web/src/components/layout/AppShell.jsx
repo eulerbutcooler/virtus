@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar.jsx'
 import Topbar from './Topbar.jsx'
+import { useAuth } from '../../hooks/useAuth.jsx'
 import './AppShell.css'
 
 export default function AppShell() {
@@ -10,7 +11,6 @@ export default function AppShell() {
   const [isMobile, setIsMobile] = useState(false)
   const location = useLocation()
 
-  // Auto-collapse on tablet
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth
@@ -26,7 +26,6 @@ export default function AppShell() {
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false)
   }, [location.pathname])
@@ -39,8 +38,7 @@ export default function AppShell() {
     }
   }
 
-  // Mock user for now
-  const user = { name: 'Amaan Ali' }
+  const { user, logout } = useAuth()
 
   const getPageTitle = () => {
     const titles = {
@@ -67,11 +65,14 @@ export default function AppShell() {
         onToggle={handleToggle}
         mobileOpen={mobileOpen}
         onMobileClose={() => setMobileOpen(false)}
+        isMobile={isMobile}
       />
       <Topbar
         pageTitle={getPageTitle()}
         onMenuToggle={handleToggle}
         user={user}
+        onLogout={logout}
+        collapsed={collapsed}
       />
       <div className={[
         'appshell__content',

@@ -12,15 +12,14 @@ import { formatCurrency, formatDate } from '../../../lib/formatters';
 export default function FulfillmentsPage() {
   const { fulfillments, loading, beginFulfillment, cancelFulfillment, shipDelivery, verifyDelivery, failDelivery } = useAdminFulfillments();
   const { requests } = useAdminRequests(); // To select funded requests for fulfillment
-  
+
   const [beginModalOpen, setBeginModalOpen] = useState(false);
   const [shipModalOpen, setShipModalOpen] = useState(false);
   const [verifyModalOpen, setVerifyModalOpen] = useState(false);
   const [selectedFulfillment, setSelectedFulfillment] = useState(null);
-  
+
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Form states
   const [beginForm, setBeginForm] = useState({ request_id: '', vendor_name: '', vendor_ref: '', actual_cost: '', notes: '' });
   const [shipForm, setShipForm] = useState({ tracking_number: '', carrier: '' });
   const [verifyForm, setVerifyForm] = useState({ proof_photo_url: '', delivered_at: new Date().toISOString() });
@@ -63,9 +62,7 @@ export default function FulfillmentsPage() {
     if (!selectedFulfillment) return;
     setActionLoading(true);
     try {
-      // Find delivery ID from fulfillment if nested, assume the API routes take delivery_id or fulfillment_id.
-      // Wait, shipDelivery creates a delivery. The prompt says `/admin/deliveries/{id}/verify`.
-      // Let's assume fulfillment returns its delivery object inside `fulfillment.delivery`.
+
       const deliveryId = selectedFulfillment.delivery?.id;
       if (deliveryId) {
         await verifyDelivery(deliveryId, verifyForm.proof_photo_url, verifyForm.delivered_at);
@@ -111,9 +108,9 @@ export default function FulfillmentsPage() {
     { key: 'cost', label: 'Cost', render: f => formatCurrency(f.actual_cost) },
     { key: 'status', label: 'Status', render: f => getStatusBadge(f.status) },
     { key: 'date', label: 'Date', render: f => formatDate(f.created_at) },
-    { 
-      key: 'actions', 
-      label: 'Actions', 
+    {
+      key: 'actions',
+      label: 'Actions',
       render: f => (
         <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           {f.status === 'processing' || f.status === 'purchased' ? (
@@ -126,29 +123,29 @@ export default function FulfillmentsPage() {
              <Button size="sm" variant="ghost" style={{ color: 'var(--error)' }} onClick={() => handleCancel(f)} disabled={actionLoading}>Cancel</Button>
           )}
         </div>
-      ) 
+      )
     }
   ];
 
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '1200px', margin: '0 auto' }}>
-      <PageHeader 
-        title="Fulfillments & Deliveries" 
-        subtitle="Manage purchasing and shipping of funded requests" 
+      <PageHeader
+        title="Fulfillments & Deliveries"
+        subtitle="Manage purchasing and shipping of funded requests"
         action={<Button variant="primary" onClick={() => setBeginModalOpen(true)}>+ Begin Fulfillment</Button>}
       />
-      
+
       {loading ? (
         <div style={{ height: '300px', animation: 'shimmer 1.5s infinite', background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)' }}></div>
       ) : (
         <Table columns={columns} data={fulfillments} />
       )}
 
-      {/* Begin Fulfillment Modal */}
+
       <Modal open={beginModalOpen} onClose={() => setBeginModalOpen(false)} title="Begin Fulfillment">
         <form onSubmit={handleBegin} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
-          <select 
-            value={beginForm.request_id} 
+          <select
+            value={beginForm.request_id}
             onChange={e => setBeginForm(p => ({ ...p, request_id: e.target.value }))}
             required
             style={{ padding: 'var(--space-2)', background: 'var(--bg-surface)', border: '1px solid var(--border-default)', color: 'var(--text-primary)', borderRadius: 'var(--radius-sm)' }}
@@ -164,7 +161,7 @@ export default function FulfillmentsPage() {
         </form>
       </Modal>
 
-      {/* Ship Delivery Modal */}
+
       <Modal open={shipModalOpen} onClose={() => setShipModalOpen(false)} title="Ship Fulfillment">
         <form onSubmit={handleShip} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <p style={{ color: 'var(--text-secondary)' }}>Log shipping details for <strong>{selectedFulfillment?.request?.item_name}</strong>.</p>
@@ -174,7 +171,7 @@ export default function FulfillmentsPage() {
         </form>
       </Modal>
 
-      {/* Verify Delivery Modal */}
+
       <Modal open={verifyModalOpen} onClose={() => setVerifyModalOpen(false)} title="Verify Delivery">
         <form onSubmit={handleVerify} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
           <p style={{ color: 'var(--text-secondary)' }}>Provide proof of delivery for <strong>{selectedFulfillment?.request?.item_name}</strong>.</p>

@@ -33,7 +33,11 @@
 }
 
 .table tbody tr:hover {
-  background: var(--bg-surface);
+  background: var(--bg-hover);
+}
+
+.table tbody tr:hover td {
+  border-bottom-color: rgba(92, 171, 110, 0.15);
 }
 
 @media (max-width: 768px) {

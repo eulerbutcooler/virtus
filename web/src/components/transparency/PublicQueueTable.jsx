@@ -17,16 +17,16 @@ export default function PublicQueueTable({ queue, loading }) {
   }
 
   const columns = [
-    { key: 'position', label: 'Position', render: q => <strong style={{ color: 'var(--beige-200)' }}>#{q.position}</strong> },
+    { key: 'position', label: 'Position', render: q => <strong style={{ fontFamily: 'var(--font-display)', color: 'var(--leaf-300)', fontSize: 'var(--font-md)' }}>#{q.position}</strong> },
     { key: 'item_name', label: 'Requested Item', render: q => <span style={{ color: 'var(--text-primary)' }}>{q.request?.item_name || 'Anonymous Item'}</span> },
-    { 
-      key: 'funding', 
-      label: 'Funding Progress', 
+    {
+      key: 'funding',
+      label: 'Funding Progress',
       render: q => (
         <div style={{ minWidth: '150px' }}>
           <ProgressBar value={q.funding_progress || 0} label={`${Math.floor(q.funding_progress || 0)}%`} />
         </div>
-      ) 
+      )
     },
     { key: 'eta', label: 'Estimated Fulfillment', render: q => <span style={{ color: 'var(--text-secondary)' }}>{q.estimated_fulfillment || 'Pending'}</span> }
   ];

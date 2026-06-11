@@ -1,6 +1,10 @@
 .appshell {
   min-height: 100vh;
   background: var(--bg-primary);
+
+  background-image:
+    radial-gradient(ellipse at 20% 80%, rgba(92,171,110,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(242,201,76,0.02) 0%, transparent 50%);
 }
 
 .appshell__content {

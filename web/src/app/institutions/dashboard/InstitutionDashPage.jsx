@@ -21,12 +21,12 @@ export default function InstitutionDashPage() {
     setActionLoading(true);
     try {
       const tagsArray = contribForm.tags.split(',').map(t => t.trim()).filter(Boolean);
-      await createContribution(institution.id, { 
-        amount: Number(contribForm.amount), 
+      await createContribution(institution.id, {
+        amount: Number(contribForm.amount),
         currency: 'USD',
-        category_tags: tagsArray 
+        category_tags: tagsArray
       });
-      // Skip stripe UI for admin/institution demo, or assume it works
+
       setModalOpen(false);
       setContribForm({ amount: '', tags: '' });
     } catch (err) {
@@ -53,9 +53,9 @@ export default function InstitutionDashPage() {
 
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '1200px', margin: '0 auto' }}>
-      <PageHeader 
-        title="Institution Dashboard" 
-        subtitle="Manage your institutional impact and directed pool contributions" 
+      <PageHeader
+        title="Institution Dashboard"
+        subtitle="Manage your institutional impact and directed pool contributions"
         action={<Button variant="primary" onClick={() => setModalOpen(true)}>New Contribution</Button>}
       />
 
@@ -74,7 +74,7 @@ export default function InstitutionDashPage() {
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Total Contributed</div>
-          <div style={{ fontSize: 'var(--font-2xl)', color: 'var(--beige-200)' }}>
+          <div style={{ fontFamily: 'var(--font-display)', fontSize: 'var(--font-2xl)', color: 'var(--solar-300)', letterSpacing: '-0.03em', textShadow: '0 0 20px rgba(242,201,76,0.2)' }}>
             {formatCurrency(contributions.reduce((acc, c) => acc + c.amount, 0))}
           </div>
         </div>

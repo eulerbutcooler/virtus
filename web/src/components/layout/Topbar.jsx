@@ -1,12 +1,12 @@
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Menu01Icon } from '@hugeicons/core-free-icons'
-import { Logout01Icon } from '@hugeicons/core-free-icons'
+import { Menu01Icon, Logout01Icon } from '@hugeicons/core-free-icons'
 import Avatar from '../ui/Avatar.jsx'
+import ThemeToggle from '../ui/ThemeToggle.jsx'
 import './Topbar.css'
 
-export default function Topbar({ pageTitle, onMenuToggle, user }) {
+export default function Topbar({ pageTitle, onMenuToggle, user, onLogout, collapsed }) {
   return (
-    <header className="topbar">
+    <header className={['topbar', collapsed ? 'topbar--collapsed' : ''].filter(Boolean).join(' ')}>
       <div className="topbar__left">
         <button
           className="topbar__hamburger"
@@ -19,13 +19,16 @@ export default function Topbar({ pageTitle, onMenuToggle, user }) {
       </div>
 
       <div className="topbar__right">
+
+        <ThemeToggle />
+
         {user && (
           <div className="topbar__user">
             <Avatar name={user.name} size="sm" />
             <span className="topbar__user-name">{user.name}</span>
           </div>
         )}
-        <button className="topbar__logout" aria-label="Logout">
+        <button className="topbar__logout" aria-label="Logout" onClick={onLogout}>
           <HugeiconsIcon icon={Logout01Icon} size={18} color="currentColor" strokeWidth={1.5} />
         </button>
       </div>

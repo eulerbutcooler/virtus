@@ -20,11 +20,12 @@
 }
 
 .page-header__title {
+  font-family: var(--font-display);
   font-size: var(--font-xl);
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
   color: var(--text-primary);
   line-height: var(--line-height-tight);
-  letter-spacing: var(--letter-spacing);
+  letter-spacing: -0.025em;
 }
 
 .page-header__subtitle {

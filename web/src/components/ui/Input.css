@@ -9,7 +9,7 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-3);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
   outline: none;
   resize: vertical;
 }
@@ -19,17 +19,22 @@
 }
 
 .input:focus {
-  border-color: var(--border-focus);
-  box-shadow: 0 0 0 2px rgba(212, 197, 169, 0.15);
+  border-color: var(--leaf-300);
+  box-shadow: 0 0 0 3px rgba(92, 171, 110, 0.12);
+  background: var(--bg-hover);
+}
+
+.input:hover:not(:focus):not(:disabled) {
+  border-color: rgba(92, 171, 110, 0.3);
 }
 
 .input:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 input.input {
-  height: 36px;
+  height: 38px;
 }
 
 textarea.input {

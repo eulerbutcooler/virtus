@@ -10,7 +10,7 @@ export function useRequests(limit = null) {
     try {
       setLoading(true);
       const data = await api.get(`/requests${limit ? `?limit=${limit}` : ''}`);
-      setRequests(data.items || []);
+      setRequests(Array.isArray(data) ? data : (data.items || []));
     } catch (err) {
       setError(err);
     } finally {

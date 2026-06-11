@@ -58,9 +58,9 @@ export default function AdminRequestsPage() {
     { key: 'status', label: 'Status', render: r => getStatusBadge(r.status) },
     { key: 'estimated_cost', label: 'Est. Cost', render: r => formatCurrency(r.estimated_cost) },
     { key: 'created_at', label: 'Date', render: r => formatDate(r.created_at) },
-    { 
-      key: 'actions', 
-      label: 'Actions', 
+    {
+      key: 'actions',
+      label: 'Actions',
       render: r => (
         <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
           {r.status === 'pending' && (
@@ -70,14 +70,14 @@ export default function AdminRequestsPage() {
             </>
           )}
         </div>
-      ) 
+      )
     }
   ];
 
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '1200px', margin: '0 auto' }}>
       <PageHeader title="Requests Management" subtitle="Verify or reject incoming member requests" />
-      
+
       {loading ? (
         <div style={{ height: '300px', animation: 'shimmer 1.5s infinite', background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)' }}></div>
       ) : (

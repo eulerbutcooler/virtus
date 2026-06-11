@@ -16,6 +16,7 @@ export default function RequestsPage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [editError, setEditError] = useState(null);
 
   const handleDelete = async () => {
     if (!selectedRequest) return;
@@ -34,15 +35,22 @@ export default function RequestsPage() {
   const handleEditSubmit = async (formData) => {
     if (!selectedRequest) return;
     setActionLoading(true);
+    setEditError(null);
     try {
       await updateRequest(selectedRequest.id, formData);
       setEditModalOpen(false);
       setSelectedRequest(null);
     } catch (error) {
-      console.error('Failed to update', error);
+      setEditError(error.message || 'Failed to update request');
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const handleEditClose = () => {
+    setEditModalOpen(false);
+    setSelectedRequest(null);
+    setEditError(null);
   };
 
   const getUrgencyBadge = (urgency) => {
@@ -57,9 +65,12 @@ export default function RequestsPage() {
 
   const getStatusBadge = (status) => {
     const map = {
-      pending: 'warning',
+      draft: 'neutral',
+      submitted: 'warning',
+      verified: 'info',
       queued: 'warning',
       funded: 'success',
+      procuring: 'info',
       delivered: 'success',
       completed: 'success',
       rejected: 'error'
@@ -88,9 +99,9 @@ export default function RequestsPage() {
 
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '1200px', margin: '0 auto' }}>
-      <PageHeader 
-        title="My Requests" 
-        subtitle="Manage your requests in the community pool" 
+      <PageHeader
+        title="My Requests"
+        subtitle="Manage your requests in the community pool"
         action={
           <Link to="/dashboard/requests/new">
             <Button variant="primary">+ New Request</Button>
@@ -101,8 +112,8 @@ export default function RequestsPage() {
       {loading ? (
         <div style={{ height: '300px', animation: 'shimmer 1.5s infinite', background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)' }}></div>
       ) : requests.length === 0 ? (
-        <EmptyState 
-          title="No requests yet" 
+        <EmptyState
+          title="No requests yet"
           description="Submit your first request to join the community queue."
           action={<Link to="/dashboard/requests/new"><Button variant="primary">Submit Request</Button></Link>}
         />
@@ -110,18 +121,20 @@ export default function RequestsPage() {
         <Table columns={columns} data={requests} />
       )}
 
-      {/* Edit Modal */}
-      <Modal open={editModalOpen} onClose={() => setEditModalOpen(false)} title="Edit Request">
+
+      <Modal open={editModalOpen} onClose={handleEditClose} title="Edit Request">
+        {editError && <div style={{ color: 'var(--error)', marginBottom: 'var(--space-4)', fontSize: 'var(--font-sm)' }}>{editError}</div>}
         {selectedRequest && (
-          <RequestForm 
-            initialData={selectedRequest} 
-            onSubmit={handleEditSubmit} 
-            isLoading={actionLoading} 
+          <RequestForm
+            initialData={selectedRequest}
+            onSubmit={handleEditSubmit}
+            onCancel={handleEditClose}
+            isLoading={actionLoading}
           />
         )}
       </Modal>
 
-      {/* Delete Confirmation Modal */}
+
       <Modal open={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} title="Delete Request">
         <p style={{ marginBottom: 'var(--space-6)' }}>
           Are you sure you want to delete the request for <strong>{selectedRequest?.item_name}</strong>? This action cannot be undone.

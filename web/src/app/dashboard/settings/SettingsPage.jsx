@@ -48,7 +48,7 @@ export default function SettingsPage() {
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '800px', margin: '0 auto', position: 'relative' }}>
       <PageHeader title="Settings" subtitle="Manage your account preferences" />
-      
+
       {toast && (
         <div style={{
           position: 'fixed', bottom: 'var(--space-6)', right: 'var(--space-6)',

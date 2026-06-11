@@ -33,7 +33,7 @@ export function useInstitution() {
   };
 
   const createContribution = async (id, payload) => {
-    // payload: { amount, currency, category_tags, region_tags }
+
     const data = await api.post(`/institutions/${id}/contributions`, payload);
     await fetchInstitutionData();
     return data; // returns client_secret for Stripe

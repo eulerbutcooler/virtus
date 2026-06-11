@@ -5,8 +5,9 @@
   border-radius: 50%;
   overflow: hidden;
   flex-shrink: 0;
-  background: var(--bg-surface);
-  color: var(--beige-300);
+  background: rgba(92, 171, 110, 0.12);
+  color: var(--leaf-300);
+  border: 1px solid rgba(92, 171, 110, 0.2);
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--letter-spacing);
   user-select: none;

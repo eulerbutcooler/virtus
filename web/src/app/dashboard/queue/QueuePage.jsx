@@ -16,9 +16,9 @@ export default function QueuePage() {
   useEffect(() => {
     async function fetchMyQueue() {
       if (reqLoading) return;
-      
+
       const activeRequests = requests.filter(r => r.status === 'pending' || r.status === 'queued' || r.status === 'funded');
-      
+
       if (activeRequests.length === 0) {
         setQueueLoading(false);
         return;
@@ -26,7 +26,7 @@ export default function QueuePage() {
 
       try {
         setQueueLoading(true);
-        // Fetch queue position for each active request
+
         const entries = await Promise.all(
           activeRequests.map(async (req) => {
             try {
@@ -48,16 +48,16 @@ export default function QueuePage() {
   }, [requests, reqLoading]);
 
   const columns = [
-    { key: 'position', label: 'Position', render: q => <strong style={{ color: 'var(--beige-200)' }}>#{q.position}</strong> },
+    { key: 'position', label: 'Position', render: q => <strong style={{ fontFamily: 'var(--font-display)', color: 'var(--leaf-300)', fontSize: 'var(--font-md)' }}>#{q.position}</strong> },
     { key: 'item_name', label: 'Item', render: q => <span style={{ color: 'var(--text-primary)' }}>{q.request?.item_name}</span> },
-    { 
-      key: 'funding', 
-      label: 'Funding Progress', 
+    {
+      key: 'funding',
+      label: 'Funding Progress',
       render: q => (
         <div style={{ minWidth: '150px' }}>
           <ProgressBar value={q.funding_progress || 0} label={`${Math.floor(q.funding_progress || 0)}%`} />
         </div>
-      ) 
+      )
     },
     { key: 'eta', label: 'ETA', render: q => <span style={{ color: 'var(--text-secondary)' }}>{q.estimated_fulfillment || 'Pending'}</span> }
   ];
@@ -66,16 +66,16 @@ export default function QueuePage() {
 
   return (
     <div style={{ padding: 'var(--space-6)', maxWidth: '1000px', margin: '0 auto' }}>
-      <PageHeader 
-        title="My Queue" 
-        subtitle="Track the status of your active requests in the community queue." 
+      <PageHeader
+        title="My Queue"
+        subtitle="Track the status of your active requests in the community queue."
       />
 
       {loading ? (
         <div style={{ height: '300px', animation: 'shimmer 1.5s infinite', background: 'var(--bg-surface)', borderRadius: 'var(--radius-lg)' }}></div>
       ) : queueEntries.length === 0 ? (
-        <EmptyState 
-          title="No active queue entries" 
+        <EmptyState
+          title="No active queue entries"
           description="You don't have any requests currently waiting in the queue."
           action={<Link to="/dashboard/requests/new"><Button variant="primary">Submit Request</Button></Link>}
         />

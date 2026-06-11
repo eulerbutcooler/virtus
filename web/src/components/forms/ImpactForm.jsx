@@ -25,9 +25,9 @@ export default function ImpactForm({ deliveries, onSubmit, onCancel, isLoading }
     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Delivered Item</label>
-        <select 
-          name="delivery_id" 
-          value={formData.delivery_id} 
+        <select
+          name="delivery_id"
+          value={formData.delivery_id}
           onChange={handleChange}
           required
           style={{ padding: 'var(--space-2)', background: 'var(--bg-surface)', border: '1px solid var(--border-default)', color: 'var(--text-primary)', borderRadius: 'var(--radius-sm)' }}
@@ -43,9 +43,9 @@ export default function ImpactForm({ deliveries, onSubmit, onCancel, isLoading }
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Time Interval</label>
-        <select 
-          name="interval" 
-          value={formData.interval} 
+        <select
+          name="interval"
+          value={formData.interval}
           onChange={handleChange}
           style={{ padding: 'var(--space-2)', background: 'var(--bg-surface)', border: '1px solid var(--border-default)', color: 'var(--text-primary)', borderRadius: 'var(--radius-sm)' }}
         >
@@ -60,19 +60,19 @@ export default function ImpactForm({ deliveries, onSubmit, onCancel, isLoading }
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <label style={{ fontSize: 'var(--font-sm)', color: 'var(--text-secondary)' }}>Satisfaction Score ({formData.satisfaction_score}/5)</label>
-        <input 
-          type="range" 
-          name="satisfaction_score" 
-          min="1" max="5" 
-          value={formData.satisfaction_score} 
-          onChange={handleChange} 
+        <input
+          type="range"
+          name="satisfaction_score"
+          min="1" max="5"
+          value={formData.satisfaction_score}
+          onChange={handleChange}
         />
       </div>
 
-      <textarea 
-        name="description" 
-        placeholder="How has this item impacted your situation?" 
-        value={formData.description} 
+      <textarea
+        name="description"
+        placeholder="How has this item impacted your situation?"
+        value={formData.description}
         onChange={handleChange}
         style={{ padding: 'var(--space-2)', background: 'var(--bg-surface)', border: '1px solid var(--border-default)', color: 'var(--text-primary)', borderRadius: 'var(--radius-sm)', minHeight: '80px', fontFamily: 'inherit' }}
         required
